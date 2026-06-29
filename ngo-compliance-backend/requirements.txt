@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+pymupdf
+pytesseract
+pillow
+chromadb
+sentence-transformers
+psycopg2-binary
+sqlalchemy
+python-dotenv
+ollama
+weasyprint
