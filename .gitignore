@@ -3,6 +3,9 @@
 # =========================
 node_modules/
 .next/
+ngo-compliance-frontend\node_modules
+ngo-compliance-frontend\next-env.d.ts
+ngo-compliance-frontend\.next/
 out/
 
 # Logs
