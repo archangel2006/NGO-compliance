@@ -1,13 +1,28 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
+python-dotenv
+sqlalchemy
+psycopg2-binary
+alembic
+
+# OCR
 pymupdf
 pytesseract
-pillow
+Pillow
+opencv-python-headless
+
+# NLP
+spacy
+# after install: python -m spacy download en_core_web_sm
+
+# RAG + Embeddings
 chromadb
-sentence-transformers
-psycopg2-binary
-sqlalchemy
-python-dotenv
 ollama
+
+# Report
 weasyprint
+
+# Utilities
+pydantic
+httpx
