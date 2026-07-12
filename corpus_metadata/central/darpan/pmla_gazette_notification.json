@@ -1,0 +1,13 @@
+{
+  "act_name": "PMLA Gazette Notification \u2014 NGO Compliance",
+  "jurisdiction": "central",
+  "applicable_states": [
+    "all"
+  ],
+  "source_url": "ngodarpan.gov.in/rss/oc/rsrc/PMLA_Gazette_Notification.pdf",
+  "filename": "pmla_gazette_notification.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:22.319356",
+  "total_chunks": 10,
+  "new_chunks": 0
+}

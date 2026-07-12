@@ -1,0 +1,13 @@
+{
+  "act_name": "Karnataka Societies Registration Act, 1960",
+  "jurisdiction": "state",
+  "applicable_states": [
+    "karnataka"
+  ],
+  "source_url": "indiacode.nic.in/bitstream/123456789/7743/1/17_of_1960_(e).pdf",
+  "filename": "karnataka_societies_registration_act_1960.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:36.984681",
+  "total_chunks": 62,
+  "new_chunks": 0
+}

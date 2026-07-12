@@ -1,0 +1,13 @@
+{
+  "act_name": "RBI Master Circular \u2014 NGO Bank Accounts Chapter VII-46A",
+  "jurisdiction": "central",
+  "applicable_states": [
+    "all"
+  ],
+  "source_url": "ngodarpan.gov.in/rss/oc/rsrc/RBI_Master_Circular-Chatpter-VII-46A.pdf",
+  "filename": "rbi_master_circular_ngo_accounts.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:22.063520",
+  "total_chunks": 227,
+  "new_chunks": 40
+}

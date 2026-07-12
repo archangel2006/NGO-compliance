@@ -1,0 +1,13 @@
+{
+  "act_name": "Karnataka Societies Registration Rules, 1961",
+  "jurisdiction": "state",
+  "applicable_states": [
+    "karnataka"
+  ],
+  "source_url": "dpal.karnataka.gov.in",
+  "filename": "karnataka_societies_registration_rules_1961.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:37.202555",
+  "total_chunks": 65,
+  "new_chunks": 0
+}

@@ -1,0 +1,13 @@
+{
+  "act_name": "Bombay Public Trusts Rules, 1951",
+  "jurisdiction": "state",
+  "applicable_states": [
+    "maharashtra"
+  ],
+  "source_url": "charity.maharashtra.gov.in/Portals/0/Files/B.P.T.Rules,1951.pdf",
+  "filename": "bombay_public_trusts_rules_1951.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:23.218445",
+  "total_chunks": 72,
+  "new_chunks": 0
+}

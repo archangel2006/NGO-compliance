@@ -1,0 +1,13 @@
+{
+  "act_name": "Societies Registration Act, 1860",
+  "jurisdiction": "central",
+  "applicable_states": [
+    "all"
+  ],
+  "source_url": "indiacode.nic.in/bitstream/123456789/2262/1/AA1860-21.pdf",
+  "filename": "societies_registration_act_1860.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:51:44.308559",
+  "total_chunks": 99,
+  "new_chunks": 20
+}

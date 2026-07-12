@@ -1,0 +1,13 @@
+{
+  "act_name": "Bombay Public Trusts Act, 1950",
+  "jurisdiction": "state",
+  "applicable_states": [
+    "maharashtra"
+  ],
+  "source_url": "charity.maharashtra.gov.in/Portals/0/Files/B.P.T.Act,1950.pdf",
+  "filename": "bombay_public_trusts_act_1950.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:22.911969",
+  "total_chunks": 148,
+  "new_chunks": 0
+}

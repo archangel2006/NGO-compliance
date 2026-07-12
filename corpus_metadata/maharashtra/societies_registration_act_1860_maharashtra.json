@@ -1,0 +1,13 @@
+{
+  "act_name": "Societies Registration Act, 1860 (Maharashtra)",
+  "jurisdiction": "state",
+  "applicable_states": [
+    "maharashtra"
+  ],
+  "source_url": "charity.maharashtra.gov.in/Portals/0/Files/S.R.Act1860.pdf",
+  "filename": "societies_registration_act_1860_maharashtra.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:54:23.339359",
+  "total_chunks": 29,
+  "new_chunks": 0
+}

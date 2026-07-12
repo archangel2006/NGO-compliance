@@ -73,15 +73,39 @@ def extract_section_ref(text: str) -> str:
 
 
 def split_long_section(text: str, max_len: int = MAX_CHUNK_LENGTH) -> List[str]:
-    """Split oversized sections on paragraph breaks."""
+    """
+    Split oversized sections while guaranteeing that no chunk exceeds max_len.
+    First split on paragraph boundaries. If an individual paragraph is still
+    too large, split it into fixed-size pieces.
+    """
     paragraphs = re.split(r'\n\s*\n', text)
-    result, current = [], ""
+
+    result = []
+    current = ""
+
     for para in paragraphs:
-        if len(current) + len(para) > max_len and current:
+        para = para.strip()
+        if not para:
+            continue
+
+        # Handle a single paragraph that's larger than max_len
+        if len(para) > max_len:
+            if current:
+                result.append(current.strip())
+                current = ""
+
+            for i in range(0, len(para), max_len):
+                result.append(para[i:i + max_len].strip())
+            continue
+
+        # Add paragraph to current chunk if it fits
+        if current and len(current) + len(para) + 2 > max_len:
             result.append(current.strip())
             current = para
         else:
-            current += "\n\n" + para
-    if current.strip():
+            current += ("\n\n" if current else "") + para
+
+    if current:
         result.append(current.strip())
-    return result if result else [text]
+
+    return result

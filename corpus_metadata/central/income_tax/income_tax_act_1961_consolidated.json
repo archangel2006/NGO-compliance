@@ -1,0 +1,13 @@
+{
+  "act_name": "Income Tax Act, 1961 (consolidated, includes 12A, 12AB, 80G)",
+  "jurisdiction": "central",
+  "applicable_states": [
+    "all"
+  ],
+  "source_url": "incometaxindia.gov.in",
+  "filename": "income_tax_act_1961_consolidated.pdf",
+  "ingested": true,
+  "ingested_date": "2026-07-12T22:52:41.030454",
+  "total_chunks": 1894,
+  "new_chunks": 137
+}
