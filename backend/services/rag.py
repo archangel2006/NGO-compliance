@@ -102,65 +102,122 @@ else:
 print("==========================================\n")
 
 # ── Compliance dimensions ─────────────────────────────────────────
-# evidence_fields: only fields actually produced by the current extractor.
-# Do NOT add fields that document_templates.py + extraction.py do not emit.
+# evidence_fields  : only fields actually emitted by extraction.py + document_templates.py.
+# dimension_consistency_keys : which top-level consistency categories are relevant
+#                              to this dimension (used to filter the issues list).
 DIMENSIONS = [
     {
         "id":    "registration",
         "name":  "Registration & Legal Status",
         "query": "NGO registration requirements valid registration certificate {entity_type} {state}",
-        "evidence_fields": ["registration_number", "registering_authority",
-                            "act_registered_under", "date_of_registration"],
+        # Fields produced by registration_certificate template + ner from trust_deed
+        "evidence_fields": [
+            "registration_number",
+            "registering_authority",
+            "act_registered_under",
+            "date_of_registration",
+            "state_of_registration",
+        ],
+        "dimension_consistency_keys": ["org_name", "registration_number", "date_of_registration"],
         "weight": 0.20,
     },
     {
         "id":    "governance",
         "name":  "Governance Structure",
         "query": "board of trustees governing body composition quorum {entity_type} {state}",
-        "evidence_fields": ["trustee_names", "office_bearers", "trustee_count",
-                            "quorum", "non_profit_clause_present",
-                            "dissolution_clause_present"],
+        # Fields produced by trust_deed template + NER (trustee_names, trustee_count).
+        # office_bearers is listed in ner_fields but _ner_extract never writes it — omitted.
+        "evidence_fields": [
+            "trustee_names",
+            "trustee_count",
+            "quorum",
+            "non_profit_clause_present",
+            "dissolution_clause_present",
+        ],
+        "dimension_consistency_keys": ["org_name"],
         "weight": 0.15,
     },
     {
         "id":    "membership",
         "name":  "Membership Requirements",
         "query": "minimum number of members trustees {entity_type} {state} registration",
-        "evidence_fields": ["trustee_count", "trustee_names"],
+        # trustee_count + trustee_names come from NER on trust_deed
+        "evidence_fields": [
+            "trustee_count",
+            "trustee_names",
+        ],
+        # trustee_count has only one source key in the merged dict — no consistency check possible
+        "dimension_consistency_keys": [],
         "weight": 0.10,
     },
     {
         "id":    "financial",
         "name":  "Financial Compliance",
         "query": "fund utilisation statement accounts grants receipts {state}",
-        "evidence_fields": ["financial_year", "total_receipts", "total_expenditure",
-                            "csr_grant_present", "govt_grant_present",
-                            "fund_utilisation_present"],
+        # Fields produced by annual_report template + _derive_booleans
+        "evidence_fields": [
+            "financial_year",
+            "total_receipts",
+            "total_expenditure",
+            "csr_grant_present",
+            "govt_grant_present",
+            "fund_utilisation_present",
+        ],
+        "dimension_consistency_keys": ["org_name"],
         "weight": 0.20,
     },
     {
         "id":    "tax",
         "name":  "Tax Compliance (12A/80G)",
         "query": "12A 12AB 80G income tax exemption certificate charitable organisation",
-        "evidence_fields": ["cert_12a_number", "cert_80g_number",
-                            "valid_from", "valid_until", "pan"],
+        # cert_12a_number, cert_80g_number from certificate_12a / certificate_80g templates.
+        # valid_from / valid_until are GENERIC fields shared across 12A, 80G, and FCRA docs;
+        # the extractor currently merges them into one key — whichever document is processed
+        # last wins. This is an extractor limitation.
+        # TODO: split into cert_12a_valid_until / cert_80g_valid_until in document_templates.py
+        "evidence_fields": [
+            "cert_12a_number",
+            "cert_80g_number",
+            "valid_from",
+            "valid_until",
+            "pan",
+        ],
+        # pan/cert numbers each appear under only one merged-dict key — no consistency check possible
+        "dimension_consistency_keys": [],
         "weight": 0.15,
     },
     {
         "id":    "fcra",
         "name":  "FCRA Compliance",
         "query": "FCRA registration foreign contribution designated bank account annual return FC-4",
-        "evidence_fields": ["fcra_reg_number", "valid_until",
-                            "bank_account", "bank_name", "bank_branch",
-                            "sbi_designated_account"],
+        # Fields produced by fcra_certificate template + _derive_booleans
+        # valid_until here refers to FCRA certificate expiry (same extractor limitation as above)
+        # TODO: split valid_until into fcra_valid_until in document_templates.py
+        "evidence_fields": [
+            "fcra_reg_number",
+            "valid_until",
+            "bank_account",
+            "bank_name",
+            "bank_branch",
+            "sbi_designated_account",
+        ],
+        # fcra_reg_number and bank_account have only one source key — no consistency check possible
+        "dimension_consistency_keys": ["org_name"],
         "weight": 0.10,
     },
     {
         "id":    "audit",
         "name":  "Audit Requirements",
         "query": "audited financial statements chartered accountant FCRA Rule 17 separate audit",
-        "evidence_fields": ["auditor_name", "auditor_icai",
-                            "audit_period", "fcra_audit_present"],
+        # Fields produced by audit_report template + _derive_booleans
+        "evidence_fields": [
+            "auditor_name",
+            "auditor_icai",
+            "audit_period",
+            "fcra_audit_present",
+        ],
+        # auditor_name and auditor_icai appear in only one document type — no consistency check possible
+        "dimension_consistency_keys": [],
         "weight": 0.10,
     },
 ]
@@ -217,18 +274,17 @@ def build_prompt(dimension: dict, top_chunk: str, ngo_evidence: str,
     """
     Build a focused, evidence-disciplined prompt for one compliance dimension.
     Uses the single highest-ranked retrieved legal chunk.
-    Optionally injects pre-detected cross-document consistency issues.
+    Injects only the consistency issues relevant to this dimension.
     """
     consistency_block = ""
     if consistency_issues:
         issue_lines = "\n".join(f"- {issue}" for issue in consistency_issues)
         consistency_block = f"""
 
-CROSS-DOCUMENT CONSISTENCY ISSUES DETECTED:
-{issue_lines}
-(Treat any of these as automatic FAIL for the affected fields.)"""
+CROSS-DOCUMENT CONSISTENCY ISSUES (treat each as automatic FAIL for affected fields):
+{issue_lines}"""
 
-    return f"""You are a legal compliance officer reviewing NGO documents for India.
+    return f"""You are a senior legal compliance officer reviewing NGO documents for India.
 
 STATE: {state} | ENTITY TYPE: {entity_type}
 COMPLIANCE DIMENSION: {dimension['name']}
@@ -243,15 +299,18 @@ TASK: Assess whether the NGO satisfies the {dimension['name']} requirement.
 
 Rules:
 - PASS: evidence is present and clearly satisfies the legal provision.
-- FAIL: evidence contradicts the provision, OR a consistency issue above affects this dimension.
-- UNCERTAIN: evidence is missing or ambiguous. Do NOT assume compliance from missing data.
-- Base reasoning only on the evidence and provision above. Do not invent values.
-- Keep reasoning short and specific (1-3 sentences).
+- FAIL: evidence contradicts the provision; OR a consistency issue above affects this dimension.
+- UNCERTAIN: evidence is absent or ambiguous. Do NOT assume compliance from missing data.
+- Contradictory evidence always overrides supporting evidence.
+- Apply only the legal requirements relevant to the stated ENTITY TYPE ({entity_type}).
+  Do not apply Society Act rules to Trusts, or Trust rules to Section 8 companies.
+- Cross-document inconsistencies listed above automatically cause FAIL for the affected requirement.
+- Base reasoning only on the evidence and provision shown. Do not invent or assume values.
+- Keep reasoning concise and specific (1-3 sentences referencing actual field values).
 
 Return ONLY valid JSON, no other text:
 {{
   "status": "PASS" or "FAIL" or "UNCERTAIN",
-  "confidence": 0.0 to 1.0,
   "legal_citation": "exact act name and section from the provision above",
   "ngo_evidence": "the specific field and value that determined the verdict",
   "reasoning": "concise explanation referencing specific field values"
@@ -260,54 +319,70 @@ Return ONLY valid JSON, no other text:
 
 # ── Cross-document consistency validator ─────────────────────────
 
-# Fields that can appear in multiple documents and must be consistent.
-# Each entry: field_key -> list of alternative keys that hold the same value
-# across different documents. All non-None values for a canonical key are
-# compared; any mismatch is flagged.
+# Maps a canonical label to the distinct extraction-dict keys that all hold
+# the SAME logical value but come from different document types.
+# A group must have at least 2 keys to be capable of detecting a mismatch.
+#
+# Single-key groups (e.g. "pan": ["pan"]) are excluded: even though `pan`
+# appears in multiple document templates, extract_all() merges all docs into
+# one dict and the first non-None value wins — so there is never more than
+# one value per key to compare.
 _CONSISTENCY_FIELDS: dict = {
-    # Organisation name appears in trust deed, 12A, PAN, FCRA, audit report
-    "org_name":           ["ner_org_name", "org_name_pan"],
-    # PAN appears in 12A, 80G, FCRA cert, PAN card
-    "pan":                [],
-    # Registration number appears in registration certificate and audit report
-    "registration_number": [],
+    # org_name appears under three distinct keys across different document types:
+    #   trust_deed regex  -> "org_name"
+    #   spaCy NER         -> "ner_org_name"
+    #   pan_card regex    -> "org_name_pan"
+    # These can genuinely diverge and be compared.
+    "org_name": ["org_name", "ner_org_name", "org_name_pan"],
 }
 
 
-def check_consistency(ngo_json: dict) -> list:
+def check_consistency(ngo_json: dict) -> dict:
     """
     Detect cross-document field contradictions in the merged extraction dict.
 
-    Returns a list of human-readable issue strings (empty = no issues found).
-    Each issue describes exactly which values conflict and which field they came from.
+    Returns a dict mapping canonical_label -> list[str] of issue strings.
+    The outer dict is keyed so that each dimension can cheaply filter only its own issues.
+    Example: {"org_name": ["org_name inconsistent: 'ABC Trust' (org_name) vs 'ABC Foundation' (org_name_pan)."]}
     """
-    issues = []
+    all_issues: dict = {canonical: [] for canonical in _CONSISTENCY_FIELDS}
 
-    for canonical_key, alt_keys in _CONSISTENCY_FIELDS.items():
-        all_keys = [canonical_key] + alt_keys
+    def _norm(s: str) -> str:
+        return " ".join(s.lower().split())
+
+    for canonical, keys in _CONSISTENCY_FIELDS.items():
         # Collect all non-None, non-empty values for this logical field
-        seen: list[tuple[str, str]] = []  # (key, value)
-        for k in all_keys:
+        seen: list[tuple[str, str]] = []   # [(key, raw_value), ...]
+        for k in keys:
             v = ngo_json.get(k)
             if v and str(v).strip():
                 seen.append((k, str(v).strip()))
 
         if len(seen) < 2:
-            continue  # only one source — nothing to compare
-
-        # Normalise for comparison: lowercase, collapse whitespace
-        def _norm(s: str) -> str:
-            return " ".join(s.lower().split())
+            continue   # only one source — nothing to compare
 
         base_key, base_val = seen[0]
         for other_key, other_val in seen[1:]:
             if _norm(base_val) != _norm(other_val):
-                issues.append(
-                    f"{canonical_key} inconsistent: "
+                all_issues[canonical].append(
+                    f"{canonical} inconsistent: "
                     f"'{base_val}' ({base_key}) vs '{other_val}' ({other_key})."
                 )
 
-    return issues
+    return all_issues
+
+
+def _filter_consistency_issues(all_issues: dict, dimension: dict) -> list:
+    """
+    Return only the consistency issue strings relevant to the given dimension.
+    Each dimension declares which canonical keys it cares about via
+    `dimension_consistency_keys`.
+    """
+    relevant_keys = dimension.get("dimension_consistency_keys", [])
+    filtered = []
+    for key in relevant_keys:
+        filtered.extend(all_issues.get(key, []))
+    return filtered
 
 
 def validate_citation(citation: str, state: str,
@@ -368,7 +443,7 @@ def validate_citation(citation: str, state: str,
         if section and section in citation_lower:
             return True
 
-    return False   # ← correctly outside the loop
+    return False
 
 
 def assess_dimension(dimension: dict, ngo_json: dict,
@@ -463,11 +538,10 @@ def assess_dimension(dimension: dict, ngo_json: dict,
             raw_llm_output=None,
         )
 
-    # 6. Parse JSON output
+    # 6. Parse JSON output — confidence field is intentionally ignored below
     result = safe_parse_json(raw)
 
-    status     = result.get("status", "UNCERTAIN")
-    confidence = result.get("confidence", 0.3)
+    llm_status = result.get("status", "UNCERTAIN")
     reasoning  = result.get("reasoning", "")
     evidence   = result.get("ngo_evidence", ngo_evidence)
 
@@ -476,15 +550,31 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     citation_valid = validate_citation(citation, canonical_state, chunk_meta=top_meta)
 
     # 8. Downgrade if citation cannot be verified
-    if not citation_valid and status in ("PASS", "FAIL"):
-        status     = "UNCERTAIN"
-        confidence = min(confidence, 0.5)
+    if not citation_valid and llm_status in ("PASS", "FAIL"):
+        llm_status = "UNCERTAIN"
         reasoning  = "[Citation unverified] " + reasoning
 
-    # 9. Routing
-    if status == "CORPUS_GAP":
+    # 9. Deterministic confidence — no LLM self-report used.
+    #    PASS/FAIL with verified citation -> high confidence.
+    #    UNCERTAIN (missing evidence) -> low confidence.
+    #    UNCERTAIN (parse error/fallback) -> very low confidence.
+    if llm_status in ("PASS", "FAIL") and citation_valid:
+        confidence = 0.90
+    elif llm_status == "CORPUS_GAP":
+        confidence = 0.00
+    elif "could not be parsed" in reasoning:
+        confidence = 0.10   # JSON parse failure
+    elif ngo_evidence == "No relevant fields extracted.":
+        confidence = 0.30   # evidence genuinely absent
+    else:
+        confidence = 0.50   # ambiguous / citation not verified
+
+    # 10. Deterministic routing — based on system state, not confidence score.
+    #     PASS or FAIL with a verified citation goes directly to report.
+    #     Everything else goes to human review.
+    if llm_status == "CORPUS_GAP":
         routing = "corpus_alert"
-    elif status in ("PASS", "FAIL") and confidence >= 0.85 and citation_valid:
+    elif llm_status in ("PASS", "FAIL") and citation_valid:
         routing = "auto_report"
     else:
         routing = "human_review"
@@ -492,7 +582,7 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     return Finding(
         dimension_id=dimension["id"],
         dimension_name=dimension["name"],
-        status=status,
+        status=llm_status,
         confidence=confidence,
         legal_citation=citation,
         ngo_evidence=evidence,
@@ -506,22 +596,27 @@ def assess_dimension(dimension: dict, ngo_json: dict,
 def run_full_assessment(ngo_json: dict, state: str, entity_type: str) -> list:
     """
     Run all 7 dimensions. Returns list of Finding objects.
-    Cross-document consistency is checked once upfront and injected into every dimension.
+    Cross-document consistency is checked once upfront.
+    Each dimension receives only the consistency issues relevant to it.
     """
     # Run cross-document consistency check once for all dimensions
-    consistency_issues = check_consistency(ngo_json)
-    if consistency_issues:
-        print(f"[RAG] Consistency issues detected ({len(consistency_issues)}):")
-        for issue in consistency_issues:
-            print(f"  - {issue}")
+    all_consistency = check_consistency(ngo_json)
+    total_issues = sum(len(v) for v in all_consistency.values())
+    if total_issues:
+        print(f"[RAG] Consistency issues detected ({total_issues} total):")
+        for key, issues in all_consistency.items():
+            for issue in issues:
+                print(f"  - {issue}")
     else:
         print("[RAG] No cross-document consistency issues detected.")
 
     findings = []
     for dim in DIMENSIONS:
         print(f"  Assessing: {dim['name']}...")
+        # Filter to only issues relevant to this dimension
+        dim_issues = _filter_consistency_issues(all_consistency, dim)
         finding = assess_dimension(dim, ngo_json, state, entity_type,
-                                   consistency_issues=consistency_issues)
+                                   consistency_issues=dim_issues or None)
         findings.append(finding)
         print(f"  -> {finding.status} ({round(finding.confidence*100)}% conf) "
               f"[{finding.routing}]")
@@ -555,10 +650,11 @@ def safe_parse_json(raw: str) -> dict:
                 return json.loads(match.group())
             except Exception:
                 pass
-    # Fallback: return UNCERTAIN
+    # Fallback: return UNCERTAIN.
+    # Note: confidence is not read from this dict — assess_dimension() derives
+    # it deterministically from status + citation_valid.
     return {
         "status": "UNCERTAIN",
-        "confidence": 0.3,
         "legal_citation": "",
         "ngo_evidence": "",
         "reasoning": "LLM output could not be parsed as valid JSON.",
