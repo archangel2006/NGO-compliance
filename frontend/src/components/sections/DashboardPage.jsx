@@ -2,12 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { Eye, FileText, List } from "lucide-react";
-import { THEME, NGO, FINDINGS, getFindings, getSubmissionDetails } from "@/lib/api";
+import { THEME, NGO, FINDINGS, STATES, getFindings, getSubmissionDetails } from "@/lib/api";
 import Crumb from "@/components/sections/Crumb";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Bar from "@/components/ui/Bar";
 import Ring from "@/components/ui/Ring";
+
+// Map lowercase state code → display name (e.g. 'ka' → 'Karnataka')
+const STATE_CODE_MAP = Object.fromEntries(
+  STATES.map((s) => [s.code.toLowerCase(), s.name])
+);
+
+const toStateName = (raw) => {
+  if (!raw) return "";
+  const lower = raw.toLowerCase();
+  return STATE_CODE_MAP[lower] || raw.charAt(0).toUpperCase() + raw.slice(1);
+};
 
 // Map string icon name/id to Lucide icon component if needed, but since we are keeping existing files,
 // we can resolve finding.dimension_id to its corresponding icon from lucide-react.
@@ -35,6 +46,7 @@ export default function DashboardPage({ go }) {
   const [findingsState, setFindingsState] = useState([]);
   const [ngoDetails, setNgoDetails] = useState(NGO);
   const [loading, setLoading] = useState(true);
+  const [backendScore, setBackendScore] = useState(null);
 
   useEffect(() => {
     const subId = localStorage.getItem("active_submission_id");
@@ -49,12 +61,18 @@ export default function DashboardPage({ go }) {
       try {
         const details = await getSubmissionDetails(subId);
         const res = await getFindings(subId);
-        
+
+        // Read score returned by backend if available
+        if (details.score && details.score.overall_score != null) {
+          setBackendScore(Math.round(details.score.overall_score));
+        }
+
         // Map details to match NGO shape
         setNgoDetails({
           name: details.org_name || NGO.name,
           id: details.darpan_id || NGO.id,
-          state: details.state ? details.state.toUpperCase() : NGO.state,
+          // Translate stored code ('ka') to display name ('Karnataka')
+          state: toStateName(details.state) || NGO.state,
           type: details.entity_type || NGO.type,
           reg: details.registration_no || NGO.reg,
           pan: details.pan || NGO.pan,
@@ -96,7 +114,12 @@ export default function DashboardPage({ go }) {
   const pass = findingsState.filter((finding) => finding.status === "PASS").length;
   const fail = findingsState.filter((finding) => finding.status === "FAIL").length;
   const uncertain = findingsState.filter((finding) => finding.status === "UNCERTAIN").length;
-  const overallScore = loading ? 74 : (ngoDetails.overall_score || Math.round((pass / (findingsState.length || 7)) * 100));
+  // Prefer backend-calculated score; fall back to simple pass-ratio
+  const overallScore = loading
+    ? 74
+    : backendScore != null
+    ? backendScore
+    : Math.round((pass / (findingsState.length || 7)) * 100);
 
   return (
     <div style={{ background: THEME.BG, minHeight: "100vh" }}>

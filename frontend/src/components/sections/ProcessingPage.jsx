@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { THEME, NGO, STEPS, assessSubmission, getSubmissionStatus } from "@/lib/api";
+import { THEME, STEPS, STATES, assessSubmission, getSubmissionStatus, getSubmissionDetails } from "@/lib/api";
 import Card from "@/components/ui/Card";
+
+// Map lowercase state code → display name
+const STATE_CODE_MAP = Object.fromEntries(
+  STATES.map((s) => [s.code.toLowerCase(), s.name])
+);
 
 export default function ProcessingPage({ go }) {
   const [step, setStep] = useState(0);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [orgName, setOrgName] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [entityType, setEntityType] = useState("");
   const assessStarted = useRef(false);
 
   useEffect(() => {
@@ -15,6 +23,16 @@ export default function ProcessingPage({ go }) {
       go("submit");
       return;
     }
+
+    // Load live submission details for the subtitle
+    getSubmissionDetails(subId)
+      .then((details) => {
+        setOrgName(details.org_name || "");
+        const rawState = details.state || "";
+        setStateName(STATE_CODE_MAP[rawState.toLowerCase()] || rawState);
+        setEntityType(details.entity_type || "");
+      })
+      .catch(() => {});
 
     // Trigger assessment once
     if (!assessStarted.current) {
@@ -63,7 +81,7 @@ export default function ProcessingPage({ go }) {
             <div style={{ textAlign: "center", marginBottom: 22 }}>
               <div style={{ fontSize: 38, marginBottom: 8 }}>{step >= STEPS.length ? "✅" : "⚙️"}</div>
               <h2 style={{ color: THEME.NV, fontWeight: 800, margin: "0 0 4px", fontSize: 17 }}>{step >= STEPS.length ? "Analysis Complete" : "Analysing Documents…"}</h2>
-              <p style={{ color: THEME.MT, margin: 0, fontSize: 12 }}>{NGO.name} · {NGO.state} · {NGO.type}</p>
+              <p style={{ color: THEME.MT, margin: 0, fontSize: 12 }}>{orgName || "NGO"} · {stateName || "—"} · {entityType || "—"}</p>
             </div>
             <div style={{ marginBottom: 18 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: THEME.MT, marginBottom: 4 }}>

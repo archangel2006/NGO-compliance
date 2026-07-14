@@ -6,6 +6,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
 from dotenv import load_dotenv
+import httpx
 
 # Resolve paths relative to the current file or environment variable
 backend_dir = Path(__file__).parent.parent
@@ -21,6 +22,16 @@ EMBED_MODEL  = os.getenv("EMBED_MODEL", "nomic-embed-text")
 LLM_MODEL    = os.getenv("LLM_MODEL", "mistral")
 COLLECTION   = "legal_corpus"
 
+# --- Ollama client with explicit timeout so generate/embeddings never hang ---
+# LLM_TIMEOUT: 5 min default — Mistral 7B on a large legal prompt can take 2-5 min
+# on CPU-only or low-VRAM machines. Set OLLAMA_TIMEOUT in .env to override.
+LLM_TIMEOUT  = int(os.getenv("OLLAMA_TIMEOUT", "300"))
+_ollama = ollama.Client(
+    host=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+    timeout=httpx.Timeout(LLM_TIMEOUT, connect=10.0),
+)
+print(f"[RAG] Ollama client ready — model: {LLM_MODEL}, timeout: {LLM_TIMEOUT}s")
+
 chroma_client = chromadb.PersistentClient(path=str(VECTORSTORE))
 
 # ── Dynamic Dimension Checks & Auto-recovery ──
@@ -30,7 +41,7 @@ rebuilt = False
 
 # 1. Determine dimension of the current embedding model
 try:
-    test_embedding = ollama.embeddings(model=EMBED_MODEL, prompt="test")["embedding"]
+    test_embedding = _ollama.embeddings(model=EMBED_MODEL, prompt="test")["embedding"]
     current_dim = len(test_embedding)
 except Exception as e:
     print(f"[WARN] Failed to peek current embedding model dimension: {e}. Defaulting to 768.")
@@ -169,7 +180,7 @@ def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
     Query ChromaDB for relevant legal provisions.
     Returns (combined_text, list_of_citations).
     """
-    query_embedding = ollama.embeddings(
+    query_embedding = _ollama.embeddings(
         model=EMBED_MODEL, prompt=query
     )["embedding"]
 
@@ -268,7 +279,7 @@ def validate_citation(citation: str, state: str) -> bool:
         return False
 
     # Search for the exact citation text
-    citation_embedding = ollama.embeddings(
+    citation_embedding = _ollama.embeddings(
         model=EMBED_MODEL,
         prompt=citation
     )["embedding"]
@@ -346,11 +357,46 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     prompt = build_prompt(dimension, legal_context, ngo_evidence,
                           canonical_state, entity_type)
 
-    raw = ollama.generate(
-        model=LLM_MODEL,
-        prompt=prompt,
-        options={"temperature": 0.1}   # low temp for legal reasoning
-    )["response"]
+    print(f"[RAG] Calling Ollama LLM for dimension '{dimension['id']}' (model={LLM_MODEL}, timeout={LLM_TIMEOUT}s)...")
+    print(f"[RAG] Prompt size: {len(prompt)} chars")
+    try:
+        resp = _ollama.generate(
+            model=LLM_MODEL,
+            prompt=prompt,
+            stream=False,                    # explicit — prevents streaming ambiguity
+            options={"temperature": 0.1},   # low temp for legal reasoning
+        )
+        # ollama 0.6.x returns GenerateResponse (Pydantic model), not a dict
+        raw = resp.response if hasattr(resp, "response") else resp["response"]
+        print(f"[RAG] LLM responded for '{dimension['id']}' — {len(raw)} chars")
+    except httpx.TimeoutException:
+        print(f"[RAG] ERROR: Ollama timed out after {LLM_TIMEOUT}s for '{dimension['id']}'. Returning UNCERTAIN.")
+        return Finding(
+            dimension_id=dimension["id"],
+            dimension_name=dimension["name"],
+            status="UNCERTAIN",
+            confidence=0.0,
+            legal_citation="",
+            ngo_evidence=ngo_evidence,
+            reasoning=f"LLM request timed out after {LLM_TIMEOUT}s. Try again or increase OLLAMA_TIMEOUT.",
+            routing="human_review",
+            citation_valid=False,
+            raw_llm_output=None,
+        )
+    except Exception as llm_err:
+        print(f"[RAG] ERROR: Ollama call failed for '{dimension['id']}': {llm_err}. Returning UNCERTAIN.")
+        return Finding(
+            dimension_id=dimension["id"],
+            dimension_name=dimension["name"],
+            status="UNCERTAIN",
+            confidence=0.0,
+            legal_citation="",
+            ngo_evidence=ngo_evidence,
+            reasoning=f"LLM call failed: {llm_err}",
+            routing="human_review",
+            citation_valid=False,
+            raw_llm_output=None,
+        )
 
     # 6. Parse JSON output
     result = safe_parse_json(raw)

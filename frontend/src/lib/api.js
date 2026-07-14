@@ -166,7 +166,7 @@ export const STEPS = [
   "Extracting text with PyMuPDF…",
   "Running Tesseract OCR — lang: eng+mar",
   "Structured field extraction (names, dates, reg numbers)",
-  "Querying legal corpus — Maharashtra Acts · FCRA · IT Act",
+  "Querying legal corpus — State Acts · FCRA · IT Act",
   "Assessing 7 compliance dimensions via RAG + LLM",
   "Routing 2 findings to Human Review Queue",
   "Generating compliance report",
