@@ -53,7 +53,7 @@ def test_retrieval():
             continue
 
         for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
-            print(f"  → {meta.get('act_name','?')} · {meta.get('section_ref','?')}")
+            print(f"  -> {meta.get('act_name','?')} - {meta.get('section_ref','?')}")
             print(f"    {doc[:120].strip()}...")
         print()
 

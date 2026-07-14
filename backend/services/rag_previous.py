@@ -102,8 +102,6 @@ else:
 print("==========================================\n")
 
 # ── Compliance dimensions ─────────────────────────────────────────
-# evidence_fields: only fields actually produced by the current extractor.
-# Do NOT add fields that document_templates.py + extraction.py do not emit.
 DIMENSIONS = [
     {
         "id":    "registration",
@@ -117,42 +115,39 @@ DIMENSIONS = [
         "id":    "governance",
         "name":  "Governance Structure",
         "query": "board of trustees governing body composition quorum {entity_type} {state}",
-        "evidence_fields": ["trustee_names", "office_bearers", "trustee_count",
-                            "quorum", "non_profit_clause_present",
-                            "dissolution_clause_present"],
+        "evidence_fields": ["trustee_names", "office_bearers",
+                            "governing_body_size", "quorum_clause"],
         "weight": 0.15,
     },
     {
         "id":    "membership",
         "name":  "Membership Requirements",
         "query": "minimum number of members trustees {entity_type} {state} registration",
-        "evidence_fields": ["trustee_count", "trustee_names"],
+        "evidence_fields": ["member_count", "trustee_count", "member_names"],
         "weight": 0.10,
     },
     {
         "id":    "financial",
         "name":  "Financial Compliance",
         "query": "fund utilisation statement accounts grants receipts {state}",
-        "evidence_fields": ["financial_year", "total_receipts", "total_expenditure",
-                            "csr_grant_present", "govt_grant_present",
-                            "fund_utilisation_present"],
+        "evidence_fields": ["annual_report_year", "csr_grants",
+                            "govt_grants", "fund_utilisation_present"],
         "weight": 0.20,
     },
     {
         "id":    "tax",
         "name":  "Tax Compliance (12A/80G)",
         "query": "12A 12AB 80G income tax exemption certificate charitable organisation",
-        "evidence_fields": ["cert_12a_number", "cert_80g_number",
-                            "valid_from", "valid_until", "pan"],
+        "evidence_fields": ["cert_12a_number", "cert_12a_expiry",
+                            "cert_80g_number", "cert_80g_expiry", "pan"],
         "weight": 0.15,
     },
     {
         "id":    "fcra",
         "name":  "FCRA Compliance",
         "query": "FCRA registration foreign contribution designated bank account annual return FC-4",
-        "evidence_fields": ["fcra_reg_number", "valid_until",
-                            "bank_account", "bank_name", "bank_branch",
-                            "sbi_designated_account"],
+        "evidence_fields": ["fcra_reg_number", "fcra_expiry",
+                            "fcra_bank_account", "fc4_filed"],
         "weight": 0.10,
     },
     {
@@ -183,13 +178,23 @@ class Finding:
 def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
     """
     Query ChromaDB for relevant legal provisions.
-    Returns (chunks: list[str], metadatas: list[dict]).
-    The caller selects the top chunk (index 0) for the prompt.
+    Returns (combined_text, list_of_citations).
     """
     query_embedding = _ollama.embeddings(
         model=EMBED_MODEL, prompt=query
     )["embedding"]
 
+    # Debug info requested by user
+    total_count = collection.count()
+    
+    # Raw query without filters to inspect what's available
+    raw_results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=n_results
+    )
+    raw_docs_count = len(raw_results["documents"][0]) if raw_results["documents"] else 0
+    
+    # Query with state filter
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results,
@@ -200,159 +205,92 @@ def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
             ]
         },
     )
+    filtered_docs_count = len(results["documents"][0]) if results["documents"] else 0
+
+    print(f"\n===== RAG Retrieval Debug =====")
+    print(f"Query: {query}")
+    print(f"State Input: {state}")
+    print(f"Embedding dimension: {len(query_embedding)}")
+    print(f"Collection count: {total_count}")
+    print(f"Raw retrieved docs (no filter): {raw_docs_count}")
+    if raw_docs_count > 0:
+        raw_states = [m.get("state") for m in raw_results["metadatas"][0]]
+        print(f"Raw doc states: {raw_states}")
+    print(f"After state filter: {filtered_docs_count}")
+    
+    combined = "\n\n---\n\n".join(results["documents"][0]) if filtered_docs_count > 0 else ""
+    print(f"Final legal context length: {len(combined)} chars")
+    if not combined.strip():
+        print(f"REASON WHY EMPTY: No documents matched state='{state}' or state='all'. Stored metadata states are likely different.")
+    print("================================\n")
 
     if not results["documents"] or not results["documents"][0]:
-        print(f"[RAG] No chunks retrieved for state='{state}' — query: {query[:80]}")
-        return [], []
+        return "", []
 
-    chunks  = results["documents"][0]
-    metas   = results["metadatas"][0]
-    print(f"[RAG] Retrieved {len(chunks)} chunks for state='{state}'")
-    return chunks, metas
+    docs      = results["documents"][0]
+    metas     = results["metadatas"][0]
+    citations = [
+        f"{m.get('act_name', 'Unknown Act')} · {m.get('section_ref', '')}"
+        for m in metas
+    ]
+
+    combined = "\n\n---\n\n".join(docs)
+    return combined, citations
 
 
-def build_prompt(dimension: dict, top_chunk: str, ngo_evidence: str,
-                 state: str, entity_type: str,
-                 consistency_issues: list | None = None) -> str:
-    """
-    Build a focused, evidence-disciplined prompt for one compliance dimension.
-    Uses the single highest-ranked retrieved legal chunk.
-    Optionally injects pre-detected cross-document consistency issues.
-    """
-    consistency_block = ""
-    if consistency_issues:
-        issue_lines = "\n".join(f"- {issue}" for issue in consistency_issues)
-        consistency_block = f"""
+def build_prompt(dimension: dict, legal_context: str,
+                 ngo_evidence: str, state: str, entity_type: str) -> str:
+    return f"""You are a legal compliance officer reviewing NGO registration documents for India.
 
-CROSS-DOCUMENT CONSISTENCY ISSUES DETECTED:
-{issue_lines}
-(Treat any of these as automatic FAIL for the affected fields.)"""
-
-    return f"""You are a legal compliance officer reviewing NGO documents for India.
-
-STATE: {state} | ENTITY TYPE: {entity_type}
 COMPLIANCE DIMENSION: {dimension['name']}
+STATE: {state} | ENTITY TYPE: {entity_type}
 
-LEGAL PROVISION:
-{top_chunk}
+LEGAL PROVISIONS RETRIEVED:
+{legal_context}
 
-NGO EVIDENCE:
-{ngo_evidence}{consistency_block}
+NGO DOCUMENT EVIDENCE:
+{ngo_evidence}
 
-TASK: Assess whether the NGO satisfies the {dimension['name']} requirement.
+TASK: Assess whether this NGO satisfies the {dimension['name']} requirement based strictly on the legal provisions and evidence above.
 
 Rules:
-- PASS: evidence is present and clearly satisfies the legal provision.
-- FAIL: evidence contradicts the provision, OR a consistency issue above affects this dimension.
-- UNCERTAIN: evidence is missing or ambiguous. Do NOT assume compliance from missing data.
-- Base reasoning only on the evidence and provision above. Do not invent values.
-- Keep reasoning short and specific (1-3 sentences).
+- Use ONLY the legal text provided above. Do not invent or assume any legal requirements.
+- If the evidence is ambiguous or incomplete, use UNCERTAIN.
+- If evidence clearly satisfies the law, use PASS.
+- If evidence clearly violates or is missing key requirements, use FAIL.
+- Keep reasoning to 2-3 sentences maximum.
 
-Return ONLY valid JSON, no other text:
+Return ONLY a valid JSON object, no other text:
 {{
   "status": "PASS" or "FAIL" or "UNCERTAIN",
   "confidence": 0.0 to 1.0,
-  "legal_citation": "exact act name and section from the provision above",
-  "ngo_evidence": "the specific field and value that determined the verdict",
-  "reasoning": "concise explanation referencing specific field values"
+  "legal_citation": "exact act name and section that applies",
+  "ngo_evidence": "specific text or field from NGO documents that you assessed",
+  "reasoning": "2-3 sentence explanation"
 }}"""
 
 
-# ── Cross-document consistency validator ─────────────────────────
-
-# Fields that can appear in multiple documents and must be consistent.
-# Each entry: field_key -> list of alternative keys that hold the same value
-# across different documents. All non-None values for a canonical key are
-# compared; any mismatch is flagged.
-_CONSISTENCY_FIELDS: dict = {
-    # Organisation name appears in trust deed, 12A, PAN, FCRA, audit report
-    "org_name":           ["ner_org_name", "org_name_pan"],
-    # PAN appears in 12A, 80G, FCRA cert, PAN card
-    "pan":                [],
-    # Registration number appears in registration certificate and audit report
-    "registration_number": [],
-}
-
-
-def check_consistency(ngo_json: dict) -> list:
-    """
-    Detect cross-document field contradictions in the merged extraction dict.
-
-    Returns a list of human-readable issue strings (empty = no issues found).
-    Each issue describes exactly which values conflict and which field they came from.
-    """
-    issues = []
-
-    for canonical_key, alt_keys in _CONSISTENCY_FIELDS.items():
-        all_keys = [canonical_key] + alt_keys
-        # Collect all non-None, non-empty values for this logical field
-        seen: list[tuple[str, str]] = []  # (key, value)
-        for k in all_keys:
-            v = ngo_json.get(k)
-            if v and str(v).strip():
-                seen.append((k, str(v).strip()))
-
-        if len(seen) < 2:
-            continue  # only one source — nothing to compare
-
-        # Normalise for comparison: lowercase, collapse whitespace
-        def _norm(s: str) -> str:
-            return " ".join(s.lower().split())
-
-        base_key, base_val = seen[0]
-        for other_key, other_val in seen[1:]:
-            if _norm(base_val) != _norm(other_val):
-                issues.append(
-                    f"{canonical_key} inconsistent: "
-                    f"'{base_val}' ({base_key}) vs '{other_val}' ({other_key})."
-                )
-
-    return issues
-
-
-def validate_citation(citation: str, state: str,
-                       chunk_meta: Optional[dict] = None) -> bool:
+def validate_citation(citation: str, state: str) -> bool:
     """
     Check if the cited section actually exists in ChromaDB corpus.
     Prevents hallucinated citations from reaching the report.
-
-    chunk_meta: optional metadata dict of the chunk used to build the prompt.
-    If the LLM's citation matches this chunk's act_name, we validate immediately
-    without an extra ChromaDB round-trip.
     """
     if not citation or len(citation) < 5:
         return False
 
-    citation_lower = citation.lower()
-
-    # Fast path: check against the chunk we actually fed to the model
-    if chunk_meta:
-        act = chunk_meta.get("act_name", "").lower()
-        section = chunk_meta.get("section_ref", "").lower()
-        if act and act in citation_lower:
-            print(f"[RAG] Citation validated via prompt chunk: '{act}'")
-            return True
-        if section and section in citation_lower:
-            print(f"[RAG] Citation validated via prompt chunk section: '{section}'")
-            return True
-
-    # Slow path: embed and search corpus
-    try:
-        citation_embedding = _ollama.embeddings(
-            model=EMBED_MODEL,
-            prompt=citation
-        )["embedding"]
-    except Exception as e:
-        print(f"[RAG] Citation embedding failed: {e}")
-        return False
+    # Search for the exact citation text
+    citation_embedding = _ollama.embeddings(
+        model=EMBED_MODEL,
+        prompt=citation
+    )["embedding"]
 
     results = collection.query(
         query_embeddings=[citation_embedding],
         n_results=3,
         where={
-            "$or": [
-                {"state": state},
-                {"state": "all"},
+            "$or":[
+                {"state":state},
+                {"state":"all"}
             ]
         }
     )
@@ -360,24 +298,26 @@ def validate_citation(citation: str, state: str,
     if not results["documents"] or not results["documents"][0]:
         return False
 
+    # citation in any retrieved chunk
+    citation_lower = citation.lower()
+
     for meta in results["metadatas"][0]:
-        act     = meta.get("act_name", "").lower()
+        act = meta.get("act_name", "").lower()
         section = meta.get("section_ref", "").lower()
+
         if act and act in citation_lower:
             return True
+
         if section and section in citation_lower:
             return True
 
-    return False   # ← correctly outside the loop
+        return False
 
 
 def assess_dimension(dimension: dict, ngo_json: dict,
-                     state: str, entity_type: str,
-                     consistency_issues: list | None = None) -> Finding:
+                     state: str, entity_type: str) -> Finding:
     """
     Run full RAG + LLM assessment for one compliance dimension.
-    Uses the top-1 retrieved legal chunk and a focused, compact prompt.
-    Pre-detected cross-document consistency issues are injected into the prompt.
     """
     STATE_MAP = {
         "dl": "delhi",
@@ -392,11 +332,11 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         state=canonical_state, entity_type=entity_type
     )
 
-    # 2. Retrieve top-1 legal chunk
-    chunks, metas = retrieve_legal_context(query, canonical_state)
+    # 2. Retrieve legal context
+    legal_context, retrieved_citations = retrieve_legal_context(query, canonical_state)
 
     # 3. Handle corpus gap
-    if not chunks:
+    if not legal_context.strip():
         return Finding(
             dimension_id=dimension["id"],
             dimension_name=dimension["name"],
@@ -410,32 +350,27 @@ def assess_dimension(dimension: dict, ngo_json: dict,
             citation_valid=False,
         )
 
-    top_chunk = chunks[0]
-    top_meta  = metas[0] if metas else {}
-
-    # 4. Build evidence string from fields the extractor actually produces
+    # 4. Extract relevant NGO evidence fields
     ngo_evidence = extract_evidence(ngo_json, dimension["evidence_fields"])
 
-    # 5. Build focused prompt (with optional consistency issues)
-    prompt = build_prompt(
-        dimension, top_chunk, ngo_evidence,
-        canonical_state, entity_type,
-        consistency_issues=consistency_issues,
-    )
+    # 5. Call LLM
+    prompt = build_prompt(dimension, legal_context, ngo_evidence,
+                          canonical_state, entity_type)
 
-    print(f"[RAG] Calling Ollama LLM for dimension '{dimension['id']}' "
-          f"(model={LLM_MODEL}, prompt={len(prompt)} chars, timeout={LLM_TIMEOUT}s)...")
+    print(f"[RAG] Calling Ollama LLM for dimension '{dimension['id']}' (model={LLM_MODEL}, timeout={LLM_TIMEOUT}s)...")
+    print(f"[RAG] Prompt size: {len(prompt)} chars")
     try:
         resp = _ollama.generate(
             model=LLM_MODEL,
             prompt=prompt,
-            stream=False,
-            options={"temperature": 0.1},
+            stream=False,                    # explicit — prevents streaming ambiguity
+            options={"temperature": 0.1},   # low temp for legal reasoning
         )
+        # ollama 0.6.x returns GenerateResponse (Pydantic model), not a dict
         raw = resp.response if hasattr(resp, "response") else resp["response"]
-        print(f"[RAG] LLM responded for '{dimension['id']}' - {len(raw)} chars")
+        print(f"[RAG] LLM responded for '{dimension['id']}' — {len(raw)} chars")
     except httpx.TimeoutException:
-        print(f"[RAG] TIMEOUT for '{dimension['id']}' after {LLM_TIMEOUT}s.")
+        print(f"[RAG] ERROR: Ollama timed out after {LLM_TIMEOUT}s for '{dimension['id']}'. Returning UNCERTAIN.")
         return Finding(
             dimension_id=dimension["id"],
             dimension_name=dimension["name"],
@@ -443,13 +378,13 @@ def assess_dimension(dimension: dict, ngo_json: dict,
             confidence=0.0,
             legal_citation="",
             ngo_evidence=ngo_evidence,
-            reasoning=f"LLM timed out after {LLM_TIMEOUT}s.",
+            reasoning=f"LLM request timed out after {LLM_TIMEOUT}s. Try again or increase OLLAMA_TIMEOUT.",
             routing="human_review",
             citation_valid=False,
             raw_llm_output=None,
         )
     except Exception as llm_err:
-        print(f"[RAG] ERROR for '{dimension['id']}': {llm_err}")
+        print(f"[RAG] ERROR: Ollama call failed for '{dimension['id']}': {llm_err}. Returning UNCERTAIN.")
         return Finding(
             dimension_id=dimension["id"],
             dimension_name=dimension["name"],
@@ -466,22 +401,18 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     # 6. Parse JSON output
     result = safe_parse_json(raw)
 
+    # 7. Validate citation
+    citation = result.get("legal_citation", "")
+    citation_valid = validate_citation(citation, canonical_state)
+
+    if not citation_valid and result.get("status") in ("PASS", "FAIL"):
+        result["status"] = "UNCERTAIN"
+        result["confidence"] = min(result.get("confidence", 0.5), 0.5)
+
+    # 8. Determine routing
     status     = result.get("status", "UNCERTAIN")
-    confidence = result.get("confidence", 0.3)
-    reasoning  = result.get("reasoning", "")
-    evidence   = result.get("ngo_evidence", ngo_evidence)
+    confidence = result.get("confidence", 0.0)
 
-    # 7. Validate citation — fast path checks the chunk we actually fed to the model
-    citation       = result.get("legal_citation", "")
-    citation_valid = validate_citation(citation, canonical_state, chunk_meta=top_meta)
-
-    # 8. Downgrade if citation cannot be verified
-    if not citation_valid and status in ("PASS", "FAIL"):
-        status     = "UNCERTAIN"
-        confidence = min(confidence, 0.5)
-        reasoning  = "[Citation unverified] " + reasoning
-
-    # 9. Routing
     if status == "CORPUS_GAP":
         routing = "corpus_alert"
     elif status in ("PASS", "FAIL") and confidence >= 0.85 and citation_valid:
@@ -495,8 +426,8 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         status=status,
         confidence=confidence,
         legal_citation=citation,
-        ngo_evidence=evidence,
-        reasoning=reasoning,
+        ngo_evidence=result.get("ngo_evidence", ngo_evidence),
+        reasoning=result.get("reasoning", ""),
         routing=routing,
         citation_valid=citation_valid,
         raw_llm_output=raw,
@@ -506,24 +437,14 @@ def assess_dimension(dimension: dict, ngo_json: dict,
 def run_full_assessment(ngo_json: dict, state: str, entity_type: str) -> list:
     """
     Run all 7 dimensions. Returns list of Finding objects.
-    Cross-document consistency is checked once upfront and injected into every dimension.
+    Can be parallelised with asyncio later.
     """
-    # Run cross-document consistency check once for all dimensions
-    consistency_issues = check_consistency(ngo_json)
-    if consistency_issues:
-        print(f"[RAG] Consistency issues detected ({len(consistency_issues)}):")
-        for issue in consistency_issues:
-            print(f"  - {issue}")
-    else:
-        print("[RAG] No cross-document consistency issues detected.")
-
     findings = []
     for dim in DIMENSIONS:
         print(f"  Assessing: {dim['name']}...")
-        finding = assess_dimension(dim, ngo_json, state, entity_type,
-                                   consistency_issues=consistency_issues)
+        finding = assess_dimension(dim, ngo_json, state, entity_type)
         findings.append(finding)
-        print(f"  -> {finding.status} ({round(finding.confidence*100)}% conf) "
+        print(f"  → {finding.status} ({round(finding.confidence*100)}% conf) "
               f"[{finding.routing}]")
     return findings
 
@@ -535,7 +456,7 @@ def extract_evidence(ngo_json: dict, fields: list) -> str:
     lines = []
     for field in fields:
         val = ngo_json.get(field)
-        if val is not None and val != "":
+        if val:
             lines.append(f"- {field}: {val}")
     return "\n".join(lines) if lines else "No relevant fields extracted."
 
