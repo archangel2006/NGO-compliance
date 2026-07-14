@@ -1,0 +1,177 @@
+{
+  "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+  "findings": [
+    {
+      "id": "6b3ad668-2966-4e0a-b65f-6e1e05ae4427",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "The Karnataka Registration of Societies Act, 1960 - Section 1(3)",
+      "ngo_evidence": "registration_number: KAR-BLR-2018-05512, registering_authority: OF SOCIETIES / PUBLIC TRUSTS, act_registered_under: the Karnataka Registration of Societies Act, 1960, date_of_registration: 09/01/2018",
+      "reasoning": "The NGO is registered under the Karnataka Registration of Societies Act, 1960 and has been issued a certificate of registration by the registering authority. This satisfies the criteria for being considered a registered NPO/NGO in India.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"The Karnataka Registration of Societies Act, 1960 - Section 1(3)\",\n  \"ngo_evidence\": \"registration_number: KAR-BLR-2018-05512, registering_authority: OF SOCIETIES / PUBLIC TRUSTS, act_registered_under: the Karnataka Registration of Societies Act, 1960, date_of_registration: 09/01/2018\",\n  \"reasoning\": \"The NGO is registered under the Karnataka Registration of Societies Act, 1960 and has been issued a certificate of registration by the registering authority. This satisfies the criteria for being considered a registered NPO/NGO in India.\"\n}",
+      "created_at": "2026-07-14T13:34:04.835847"
+    },
+    {
+      "id": "25cc52b9-e084-463d-a135-5a7a0502baaf",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "3 and 5 of the Karnataka Medical Council Act",
+      "ngo_evidence": "trustee_names: ['Arjun Reddy', 'Krishna Reddy', 'Meera Nair', 'Suresh Iyer', 'Ramaswamy Iyer']",
+      "reasoning": "The provided trustee names correspond to the members specified in section 5(2)(a) of the Karnataka Medical Council Act, indicating that they are elected by medical practitioners registered under this act.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"3 and 5 of the Karnataka Medical Council Act\",\n  \"ngo_evidence\": \"trustee_names: ['Arjun Reddy', 'Krishna Reddy', 'Meera Nair', 'Suresh Iyer', 'Ramaswamy Iyer']\",\n  \"reasoning\": \"The provided trustee names correspond to the members specified in section 5(2)(a) of the Karnataka Medical Council Act, indicating that they are elected by medical practitioners registered under this act.\"\n}",
+      "created_at": "2026-07-14T13:34:04.837848"
+    },
+    {
+      "id": "39e5d056-4e40-4277-a2f6-3366b5035acd",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "PASS",
+      "confidence": 1.0,
+      "legal_citation": "13 of the Karnataka Societies Registration Act, 1960",
+      "ngo_evidence": "trustee_count: 6",
+      "reasoning": "The NGO has more than 7 trustees (as per the legal provision), which satisfies the membership requirements.",
+      "routing": "auto_report",
+      "citation_valid": true,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"13 of the Karnataka Societies Registration Act, 1960\",\n  \"ngo_evidence\": \"trustee_count: 6\",\n  \"reasoning\": \"The NGO has more than 7 trustees (as per the legal provision), which satisfies the membership requirements.\"\n}",
+      "created_at": "2026-07-14T13:34:04.837848"
+    },
+    {
+      "id": "47f598f6-ebfa-4bb5-bd3a-05b8ac2d915b",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "13. Balance sheet and annual list of governing body to be filed with Registrar.",
+      "ngo_evidence": "Not provided as it is not part of the legal provisions.",
+      "reasoning": "The legal provision states that a balance sheet and income and expenditure account audited by an auditor who can act as an auditor of companies registered in Karnataka should be filed with the Registrar on or before the fourteenth day succeeding the day on which the annual general meeting of a society is held.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"13. Balance sheet and annual list of governing body to be filed with Registrar.\",\n  \"ngo_evidence\": \"Not provided as it is not part of the legal provisions.\",\n  \"reasoning\": \"The legal provision states that a balance sheet and income and expenditure account audited by an auditor who can act as an auditor of companies registered in Karnataka should be filed with the Registrar on or before the fourteenth day succeeding the day on which the annual general meeting of a society is held.\"\n}",
+      "created_at": "2026-07-14T13:34:04.837848"
+    },
+    {
+      "id": "c9d57342-f9d6-4d4f-a297-d23e180ee5ee",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "PASS",
+      "confidence": 1.0,
+      "legal_citation": "CHAPTER XII-E SPECIAL PROVISIONS RELATING TO TAX ON DISTRIBUTED INCOME",
+      "ngo_evidence": "The NGO has provided certificates for both IT-12A and IT-80G, which are the tax compliance requirements.",
+      "reasoning": "The NGO has provided evidence of compliance with both the IT-12A and IT-80G tax compliance requirements.",
+      "routing": "auto_report",
+      "citation_valid": true,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"CHAPTER XII-E SPECIAL PROVISIONS RELATING TO TAX ON DISTRIBUTED INCOME\",\n  \"ngo_evidence\": \"The NGO has provided certificates for both IT-12A and IT-80G, which are the tax compliance requirements.\",\n  \"reasoning\": \"The NGO has provided evidence of compliance with both the IT-12A and IT-80G tax compliance requirements.\"\n}",
+      "created_at": "2026-07-14T13:34:04.837848"
+    },
+    {
+      "id": "ca6bdff1-71a1-488f-a92e-ac9ff9b312f6",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "57 - Income Tax Rules 114F, 114G and 114H",
+      "ngo_evidence": "fcra_reg_number: 094650218",
+      "reasoning": "The NGO has a registered FCRA number, which indicates that it is subject to the Foreign Contribution (Regulation) Act, 2010. As a public trust operating in Karnataka, it falls under the category of REs (Reporting Entities) required to comply with FATCA and CRS reporting requirements. The provided FCRA number suggests that the NGO has complied with the registration process under FCRA.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"57 - Income Tax Rules 114F, 114G and 114H\",\n  \"ngo_evidence\": \"fcra_reg_number: 094650218\",\n  \"reasoning\": \"The NGO has a registered FCRA number, which indicates that it is subject to the Foreign Contribution (Regulation) Act, 2010. As a public trust operating in Karnataka, it falls under the category of REs (Reporting Entities) required to comply with FATCA and CRS reporting requirements. The provided FCRA number suggests that the NGO has complied with the registration process under FCRA.\"\n}",
+      "created_at": "2026-07-14T13:34:04.837848"
+    },
+    {
+      "id": "c8888240-519d-4b8e-ab3c-b29c916575a8",
+      "submission_id": "d9e58f7c-4791-46dd-ba8b-4a3799a6e0c1",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "6 - section 12 of the principal Act",
+      "ngo_evidence": "opening an FCRA Account as per the requirements mentioned in the application",
+      "reasoning": "The NGO has opened an FCRA account as required by section 12 of the principal Act, which now includes a requirement to open such an account (section 12(1A)).",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": " {\n  \"status\": \"PASS\",\n  \"confidence\": 1.0,\n  \"legal_citation\": \"6 - section 12 of the principal Act\",\n  \"ngo_evidence\": \"opening an FCRA Account as per the requirements mentioned in the application\",\n  \"reasoning\": \"The NGO has opened an FCRA account as required by section 12 of the principal Act, which now includes a requirement to open such an account (section 12(1A)).\"\n}",
+      "created_at": "2026-07-14T13:34:04.837848"
+    }
+  ],
+  "score": {
+    "overall_score": 63,
+    "label": "Partial Compliance \u2014 Significant Gaps",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "PASS",
+        "confidence": 1.0,
+        "adjusted_score": 1.0,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "PASS",
+        "confidence": 1.0,
+        "adjusted_score": 1.0,
+        "weight": 0.15,
+        "contribution": 0.15
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      }
+    },
+    "pass_count": 2,
+    "fail_count": 0,
+    "uncertain_count": 5,
+    "corpus_gap_count": 0
+  }
+}

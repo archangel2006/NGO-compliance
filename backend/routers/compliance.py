@@ -180,8 +180,9 @@ def get_assessment_status(submission_id: str,
     if not sub:
         raise HTTPException(404, "Submission not found.")
     return {
-        "submission_id": submission_id,
-        "status":        sub["status"],
-        "score":         sub.get("score"),
-        "error":         sub.get("error"),
+        "submission_id":  submission_id,
+        "status":         sub["status"],
+        "progress_step":  sub.get("progress_step", 0),
+        "score":          sub.get("score"),
+        "error":          sub.get("error"),
     }
