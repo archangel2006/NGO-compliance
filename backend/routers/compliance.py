@@ -19,8 +19,11 @@ router = APIRouter()
 def _run_assessment(submission_id: str):
     """
     Full pipeline for one submission.
-    Designed to run in background but called directly for pilot.
+    Runs asynchronously via BackgroundTasks.
     """
+    import json
+    from pathlib import Path
+
     sub  = get_submission(submission_id)
     docs = get_documents_for_submission(submission_id)
 
@@ -31,6 +34,7 @@ def _run_assessment(submission_id: str):
         return
 
     SUBMISSIONS[submission_id]["status"] = "processing"
+    SUBMISSIONS[submission_id]["progress_step"] = 1
     SUBMISSIONS[submission_id]["updated_at"] = now()
 
     state       = sub["state"]
@@ -40,7 +44,11 @@ def _run_assessment(submission_id: str):
         # ── STEP 1: OCR all uploaded documents ─────────────────────
         doc_inputs = []
         for doc in docs:
+            SUBMISSIONS[submission_id]["progress_step"] = 2
             ocr_result = extract_text(doc["file_path"], state)
+
+            if ocr_result.get("method") == "tesseract":
+                SUBMISSIONS[submission_id]["progress_step"] = 3
 
             # Update OCR status in store
             DOCUMENTS[doc["id"]]["ocr_status"]  = "done"
@@ -55,6 +63,7 @@ def _run_assessment(submission_id: str):
             })
 
         # ── STEP 2: Structured extraction ──────────────────────────
+        SUBMISSIONS[submission_id]["progress_step"] = 4
         merged = extract_all(doc_inputs)
         EXTRACTED[submission_id] = {
             "submission_id":   submission_id,
@@ -64,8 +73,10 @@ def _run_assessment(submission_id: str):
         }
 
         # ── STEP 3: RAG + LLM per dimension ────────────────────────
+        SUBMISSIONS[submission_id]["progress_step"] = 5
         findings = run_full_assessment(merged, state, entity_type)
 
+        SUBMISSIONS[submission_id]["progress_step"] = 6
         for f in findings:
             fid = new_id()
             FINDINGS[fid] = {
@@ -86,6 +97,7 @@ def _run_assessment(submission_id: str):
 
             # Route to human review queue if needed
             if f.routing == "human_review":
+                SUBMISSIONS[submission_id]["progress_step"] = 7
                 qid = new_id()
                 QUEUE[qid] = {
                     "id":                          qid,
@@ -102,10 +114,22 @@ def _run_assessment(submission_id: str):
                 }
 
         # ── STEP 4: Calculate score ─────────────────────────────────
+        SUBMISSIONS[submission_id]["progress_step"] = 8
         score = calculate_score(findings)
         SUBMISSIONS[submission_id]["score"]      = score
         SUBMISSIONS[submission_id]["status"]     = "complete"
         SUBMISSIONS[submission_id]["updated_at"] = now()
+
+        # Save findings array to assessment_results/{submission_id}.json
+        results_dir = Path("assessment_results")
+        results_dir.mkdir(parents=True, exist_ok=True)
+        findings_list = [FINDINGS[fid] for fid in FINDINGS if FINDINGS[fid]["submission_id"] == submission_id]
+        with open(results_dir / f"{submission_id}.json", "w") as f:
+            json.dump({
+                "submission_id": submission_id,
+                "findings": findings_list,
+                "score": score
+            }, f, indent=2, default=str)
 
         print(f"[Assessment complete] {sub['org_name']} "
               f"→ score {score['overall_score']} / {score['label']}")
@@ -136,14 +160,15 @@ def trigger_assessment(
     if not docs:
         raise HTTPException(400, "No documents uploaded yet.")
 
-    # For pilot: run inline (blocking)
-    # For production: use background_tasks.add_task(_run_assessment, submission_id)
-    _run_assessment(submission_id)
+    # Queue background task
+    background_tasks.add_task(_run_assessment, submission_id)
+    SUBMISSIONS[submission_id]["status"] = "processing"
+    SUBMISSIONS[submission_id]["progress_step"] = 1
 
     return {
         "submission_id": submission_id,
-        "status":        SUBMISSIONS[submission_id]["status"],
-        "message":       "Assessment complete.",
+        "status":        "processing",
+        "message":       "Assessment started in background.",
     }
 
 

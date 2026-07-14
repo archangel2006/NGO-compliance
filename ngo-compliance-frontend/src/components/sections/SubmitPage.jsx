@@ -1,23 +1,73 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, FileText, Upload, CheckCircle, Shield } from "lucide-react";
-import { THEME, NGO, DOCS, STATES } from "@/lib/api";
+import { ChevronRight, FileText, Upload, CheckCircle, Shield, Loader2 } from "lucide-react";
+import { THEME, NGO, DOCS, STATES, createSubmission, uploadDocument } from "@/lib/api";
 import Crumb from "@/components/sections/Crumb";
 import Card from "@/components/ui/Card";
 
 export default function SubmitPage({ go }) {
   const [subStep, setSubStep] = useState(0);
   const [selState, setSelState] = useState(null);
-  const [docsLoaded, setDocsLoaded] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState({}); // { doc_type: filename }
+  const [uploading, setUploading] = useState(null);
   const [form, setForm] = useState({ name: "", type: "", pan: "", year: "", sector: "", email: "" });
 
   const set = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }));
   const autoFillForm = () => setForm({ name: NGO.name, type: "Public Trust", pan: NGO.pan, year: "2019", sector: NGO.sector, email: "priya.sharma@ashajyoti.org" });
   const formComplete = Boolean(form.name && form.type && form.pan && form.year && form.sector && form.email);
+  const docsLoaded = Object.keys(uploadedFiles).length > 0;
   const STEP_LABELS = ["Select State", "NGO Details", "Upload Documents", "Submit"];
   const complexCol = { High: THEME.RD, Medium: THEME.AM };
   const stateName = STATES.find((state) => state.code === selState)?.name || "";
+
+  const docSlots = [
+    { name: "Trust Deed / MOA", cat: "Registration", cat_key: "trust_deed" },
+    { name: "Registration Certificate", cat: "Registration", cat_key: "registration_certificate" },
+    { name: "12A Certificate", cat: "Tax", cat_key: "certificate_12a" },
+    { name: "80G Certificate", cat: "Tax", cat_key: "certificate_80g" },
+    { name: "FCRA Certificate", cat: "FCRA", cat_key: "fcra_certificate" },
+    { name: "Annual Report", cat: "Financial", cat_key: "annual_report" },
+    { name: "Audited Financial Statements", cat: "Audit", cat_key: "audit_report" },
+    { name: "PAN Card", cat: "Tax / FCRA", cat_key: "pan_card" },
+  ];
+
+  const handleCreateSubmission = async () => {
+    if (!formComplete) return;
+    try {
+      const res = await createSubmission({
+        org_name: form.name,
+        state: selState.toLowerCase(),
+        entity_type: form.type,
+        pan: form.pan.toUpperCase(),
+        sector: form.sector,
+        contact_email: form.email,
+        year_of_incorporation: parseInt(form.year, 10),
+      });
+      localStorage.setItem("active_submission_id", res.id);
+      setSubStep(2);
+    } catch (err) {
+      alert("Error creating submission: " + (err.response?.data?.detail || err.message));
+    }
+  };
+
+  const handleFileUpload = async (catKey, file) => {
+    if (!file) return;
+    const subId = localStorage.getItem("active_submission_id");
+    if (!subId) {
+      alert("No active submission found. Please re-fill details.");
+      return;
+    }
+    setUploading(catKey);
+    try {
+      await uploadDocument(subId, catKey, file);
+      setUploadedFiles((current) => ({ ...current, [catKey]: file.name }));
+    } catch (err) {
+      alert("Upload failed: " + (err.response?.data?.detail || err.message));
+    } finally {
+      setUploading(null);
+    }
+  };
 
   const inputField = (label, key, placeholder) => (
     <div>
@@ -70,7 +120,7 @@ export default function SubmitPage({ go }) {
                   <div key={state.code} onClick={() => setSelState(state.code)} style={{ background: THEME.WH, borderRadius: 12, border: `2px solid ${selected ? THEME.OR : THEME.BD}`, padding: 20, cursor: "pointer", boxShadow: selected ? "0 0 0 3px rgba(232,96,26,.12)" : "none", transition: "all 0.15s", position: "relative" }}>
                     {selected && <div style={{ position: "absolute", top: 14, right: 14, width: 20, height: 20, borderRadius: "50%", background: THEME.OR, display: "flex", alignItems: "center", justifyContent: "center", color: THEME.WH, fontSize: 11, fontWeight: 700 }}>✓</div>}
                     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 10, background: selected ? "#FFF3EB" : "#F4F6FA", border: `1px solid ${selected ? THEME.OR : THEME.BD}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, color: selected ? THEME.OR : THEME.NV }}>
+                       <div style={{ width: 44, height: 44, borderRadius: 10, background: selected ? "#FFF3EB" : "#F4F6FA", border: `1px solid ${selected ? THEME.OR : THEME.BD}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 15, color: selected ? THEME.OR : THEME.NV }}>
                         {state.code}
                       </div>
                       <div>
@@ -157,7 +207,7 @@ export default function SubmitPage({ go }) {
               </Card>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <button onClick={() => setSubStep(0)} style={{ background: THEME.WH, color: THEME.NV, border: `1px solid ${THEME.BD}`, borderRadius: 7, padding: "9px", fontSize: 12, cursor: "pointer" }}>← Back</button>
-                <button onClick={() => formComplete && setSubStep(2)} disabled={!formComplete} style={{ background: formComplete ? THEME.OR : "#CBD5E1", color: THEME.WH, border: "none", borderRadius: 7, padding: "10px", fontSize: 13, fontWeight: 700, cursor: formComplete ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, boxShadow: formComplete ? "0 2px 8px rgba(232,96,26,.3)" : "none" }}>
+                <button onClick={handleCreateSubmission} disabled={!formComplete} style={{ background: formComplete ? THEME.OR : "#CBD5E1", color: THEME.WH, border: "none", borderRadius: 7, padding: "10px", fontSize: 13, fontWeight: 700, cursor: formComplete ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, boxShadow: formComplete ? "0 2px 8px rgba(232,96,26,.3)" : "none" }}>
                   Next: Upload Documents <ChevronRight size={14} />
                 </button>
                 {!formComplete && <div style={{ textAlign: "center", fontSize: 11, color: THEME.MT }}>Fill all fields to continue</div>}
@@ -181,35 +231,40 @@ export default function SubmitPage({ go }) {
                     <h3 style={{ margin: "0 0 3px", fontSize: 14, fontWeight: 700, color: THEME.NV }}>Upload Your Documents</h3>
                     <p style={{ margin: 0, color: THEME.MT, fontSize: 12 }}>Upload what you have. We'll check against {stateName} laws + central regulations and flag what's missing.</p>
                   </div>
-                  {!docsLoaded && <button onClick={() => setDocsLoaded(true)} style={{ background: "#FFF3EB", color: THEME.OR, border: "1px solid #FDDBC8", borderRadius: 6, padding: "7px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, marginLeft: 12 }}>✦ Auto-fill Sample</button>}
                 </div>
-                {!docsLoaded ? (
-                  <div style={{ border: "2px dashed #CBD5E1", borderRadius: 10, padding: "32px 20px", textAlign: "center" }}>
-                    <Upload size={26} style={{ margin: "0 auto 8px", display: "block", color: THEME.OR }} />
-                    <div style={{ fontWeight: 600, color: THEME.NV, marginBottom: 3, fontSize: 13 }}>Drag & drop documents here</div>
-                    <div style={{ fontSize: 11, color: THEME.MT }}>PDF, PNG, JPG — max 10 MB per file</div>
-                    <div style={{ marginTop: 8, fontSize: 11, color: THEME.MT }}>Trust Deed · Registration Certificate · 12A / 80G · FCRA · Audited Accounts</div>
-                    <button style={{ marginTop: 12, background: THEME.WH, color: THEME.NV, border: `1px solid ${THEME.BD}`, borderRadius: 6, padding: "7px 14px", fontSize: 12, cursor: "pointer" }}>Browse Files</button>
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 7, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: "#065F46", display: "flex", gap: 6, alignItems: "center" }}>
-                      <CheckCircle size={13} /> 7 sample documents loaded · 13.2 MB total
-                    </div>
-                    <div style={{ display: "grid", gap: 7 }}>
-                      {DOCS.map((document) => (
+
+                <div>
+                  <div style={{ display: "grid", gap: 7 }}>
+                    {docSlots.map((document) => {
+                      const uploadedFileName = uploadedFiles[document.cat_key];
+                      const isThisUploading = uploading === document.cat_key;
+                      return (
                         <div key={document.name} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "#FAFAFA", borderRadius: 7, border: `1px solid ${THEME.BD}` }}>
                           <FileText size={13} style={{ color: THEME.OR, flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 13, fontWeight: 600, color: THEME.NV }}>{document.name}</div>
-                            <div style={{ fontSize: 10, color: THEME.MT }}>{document.cat} · {document.size} · {document.pages} pages</div>
+                            <div style={{ fontSize: 10, color: THEME.MT }}>{document.cat} · {uploadedFileName ? uploadedFileName : "No file uploaded"}</div>
                           </div>
-                          <span style={{ background: "#DCFCE7", color: THEME.GR, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 10 }}>✓ Uploaded</span>
+                          {uploadedFileName ? (
+                            <span style={{ background: "#DCFCE7", color: THEME.GR, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 10 }}>✓ Uploaded</span>
+                          ) : isThisUploading ? (
+                            <Loader2 size={14} className="animate-spin" style={{ color: THEME.OR }} />
+                          ) : (
+                            <label style={{ background: THEME.WH, color: THEME.NV, border: `1px solid ${THEME.BD}`, borderRadius: 6, padding: "5px 12px", fontSize: 11, cursor: "pointer", fontWeight: 600, display: "inline-block" }}>
+                              Upload
+                              <input
+                                type="file"
+                                accept=".pdf"
+                                style={{ display: "none" }}
+                                onChange={(e) => handleFileUpload(document.cat_key, e.target.files[0])}
+                              />
+                            </label>
+                          )}
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
-                )}
+                </div>
               </Card>
             </div>
             <div>

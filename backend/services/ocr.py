@@ -14,7 +14,7 @@ LANG_MAP = {
     "central":     "eng",
 }
 
-MIN_TEXT_LENGTH  = 150   # chars per page — below this, treat as scanned
+MIN_TEXT_LENGTH  = 20   # chars per page — below this, treat as scanned
 TESSERACT_CONFIG = "--psm 6 --oem 3"   # psm 6 = assume uniform block of text
 
 

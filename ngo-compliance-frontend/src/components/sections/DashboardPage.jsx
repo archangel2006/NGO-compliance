@@ -1,15 +1,102 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Eye, FileText, List } from "lucide-react";
-import { THEME, NGO, FINDINGS } from "@/lib/api";
+import { THEME, NGO, FINDINGS, getFindings, getSubmissionDetails } from "@/lib/api";
 import Crumb from "@/components/sections/Crumb";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Bar from "@/components/ui/Bar";
 import Ring from "@/components/ui/Ring";
 
+// Map string icon name/id to Lucide icon component if needed, but since we are keeping existing files,
+// we can resolve finding.dimension_id to its corresponding icon from lucide-react.
+import {
+  Shield,
+  Building2,
+  Users,
+  DollarSign,
+  Receipt,
+  Globe,
+  BarChart2,
+} from "lucide-react";
+
+const ICON_MAP = {
+  registration: Shield,
+  governance: Building2,
+  membership: Users,
+  financial: DollarSign,
+  tax: Receipt,
+  fcra: Globe,
+  audit: BarChart2,
+};
+
 export default function DashboardPage({ go }) {
-  const pass = FINDINGS.filter((finding) => finding.status === "PASS").length;
-  const fail = FINDINGS.filter((finding) => finding.status === "FAIL").length;
-  const uncertain = FINDINGS.filter((finding) => finding.status === "UNCERTAIN").length;
+  const [findingsState, setFindingsState] = useState([]);
+  const [ngoDetails, setNgoDetails] = useState(NGO);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const subId = localStorage.getItem("active_submission_id");
+    if (!subId) {
+      setFindingsState(FINDINGS);
+      setNgoDetails(NGO);
+      setLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const details = await getSubmissionDetails(subId);
+        const res = await getFindings(subId);
+        
+        // Map details to match NGO shape
+        setNgoDetails({
+          name: details.org_name || NGO.name,
+          id: details.darpan_id || NGO.id,
+          state: details.state ? details.state.toUpperCase() : NGO.state,
+          type: details.entity_type || NGO.type,
+          reg: details.registration_no || NGO.reg,
+          pan: details.pan || NGO.pan,
+          sector: details.sector || NGO.sector,
+          by: details.submitted_by || NGO.by,
+          date: details.created_at ? details.created_at.substring(0, 10) : NGO.date,
+          city: NGO.city,
+        });
+
+        // Map findings to match FINDINGS shape (specifically injecting icon components)
+        const mapped = (res.findings || []).map((f) => ({
+          id: f.id,
+          dim: f.dimension_name,
+          dimension_id: f.dimension_id,
+          icon: ICON_MAP[f.dimension_id] || Shield,
+          status: f.status,
+          conf: f.confidence,
+          route: f.routing === "human_review" ? "human" : "auto",
+          qStatus: f.human_determination ? "reviewed" : "pending",
+          officer: "Officer Ramesh K.",
+          role: "Sr. Compliance Officer",
+          determination: f.human_determination || null,
+          citation: f.legal_citation,
+          evidence: f.ngo_evidence,
+          reasoning: f.reasoning,
+        }));
+        setFindingsState(mapped.length ? mapped : FINDINGS);
+      } catch (err) {
+        console.error("Dashboard data load failed, using fallbacks:", err);
+        setFindingsState(FINDINGS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const pass = findingsState.filter((finding) => finding.status === "PASS").length;
+  const fail = findingsState.filter((finding) => finding.status === "FAIL").length;
+  const uncertain = findingsState.filter((finding) => finding.status === "UNCERTAIN").length;
+  const overallScore = loading ? 74 : (ngoDetails.overall_score || Math.round((pass / (findingsState.length || 7)) * 100));
 
   return (
     <div style={{ background: THEME.BG, minHeight: "100vh" }}>
@@ -22,7 +109,7 @@ export default function DashboardPage({ go }) {
           </button>
           <button onClick={() => go("queue")} style={{ background: "#FEF3C7", color: THEME.AM, border: "1px solid #FDE68A", borderRadius: 6, padding: "6px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
             <Eye size={13} />Human Review Queue
-            <span style={{ background: THEME.AM, color: THEME.WH, borderRadius: 10, padding: "0 5px", fontSize: 10 }}>2</span>
+            <span style={{ background: THEME.AM, color: THEME.WH, borderRadius: 10, padding: "0 5px", fontSize: 10 }}>{uncertain}</span>
           </button>
           <button onClick={() => go("report")} style={{ background: THEME.OR, color: THEME.WH, border: "none", borderRadius: 6, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
             <FileText size={13} />Full Report
@@ -33,11 +120,11 @@ export default function DashboardPage({ go }) {
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "18px 20px" }}>
         <Card s={{ marginBottom: 16, background: "linear-gradient(135deg,#1A3A6B,#0F2451)", border: "none" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
-            <Ring score={74} />
+            <Ring score={overallScore} />
             <div style={{ flex: 1 }}>
-              <div style={{ color: THEME.OR, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>Compliance Assessment · {NGO.state} · {NGO.type}</div>
-              <h2 style={{ color: THEME.WH, fontSize: 17, fontWeight: 800, margin: "0 0 3px" }}>{NGO.name}</h2>
-              <div style={{ color: "#94A3B8", fontSize: 12, marginBottom: 12 }}>PAN: {NGO.pan} · {NGO.sector}</div>
+              <div style={{ color: THEME.OR, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>Compliance Assessment · {ngoDetails.state} · {ngoDetails.type}</div>
+              <h2 style={{ color: THEME.WH, fontSize: 17, fontWeight: 800, margin: "0 0 3px" }}>{ngoDetails.name}</h2>
+              <div style={{ color: "#94A3B8", fontSize: 12, marginBottom: 12 }}>PAN: {ngoDetails.pan} · {ngoDetails.sector}</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 {[[pass, "PASSED", "#4ADE80", "rgba(22,163,74,.2)", "rgba(22,163,74,.3)"], [fail, "FAILED", "#FCA5A5", "rgba(220,38,38,.2)", "rgba(220,38,38,.3)"], [uncertain, "UNCERTAIN", "#FCD34D", "rgba(217,119,6,.2)", "rgba(217,119,6,.3)"]].map(([value, label, color, background, border]) => (
                   <div key={label} style={{ background, border: `1px solid ${border}`, borderRadius: 7, padding: "8px 16px", textAlign: "center" }}>
@@ -46,20 +133,24 @@ export default function DashboardPage({ go }) {
                   </div>
                 ))}
                 <div style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 7, padding: "8px 16px", textAlign: "center" }}>
-                  <div style={{ color: "#CBD5E1", fontWeight: 900, fontSize: 20, lineHeight: 1 }}>7</div>
+                  <div style={{ color: "#CBD5E1", fontWeight: 900, fontSize: 20, lineHeight: 1 }}>{findingsState.length}</div>
                   <div style={{ color: "#94A3B8", fontSize: 9, marginTop: 2 }}>TOTAL</div>
                 </div>
               </div>
             </div>
             <div style={{ background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", borderRadius: 9, padding: "14px 16px", maxWidth: 170, flexShrink: 0 }}>
-              <div style={{ color: "#FCD34D", fontWeight: 700, fontSize: 13, marginBottom: 4 }}>⚠ Not Grant Ready</div>
-              <div style={{ color: "#FDE68A", fontSize: 12, lineHeight: 1.5 }}>1 critical failure and 1 pending human review must be resolved.</div>
+              <div style={{ color: "#FCD34D", fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{overallScore >= 85 ? "✓ Grant Ready" : "⚠ Action Needed"}</div>
+              <div style={{ color: "#FDE68A", fontSize: 12, lineHeight: 1.5 }}>
+                {overallScore >= 85
+                  ? "NGO satisfies all core compliance dimensions."
+                  : `${fail} critical failure and ${uncertain} pending review must be resolved.`}
+              </div>
             </div>
           </div>
         </Card>
 
         <div style={{ background: THEME.WH, borderRadius: 8, border: `1px solid ${THEME.BD}`, padding: "10px 16px", marginBottom: 16, display: "flex", gap: 24, flexWrap: "wrap" }}>
-          {[['Organisation', NGO.name], ['State', NGO.state], ['Reg. No.', NGO.reg], ['Sector', NGO.sector], ['Submitted by', NGO.by]].map(([label, value]) => (
+          {[['Organisation', ngoDetails.name], ['State', ngoDetails.state], ['Reg. No.', ngoDetails.reg], ['Sector', ngoDetails.sector], ['Submitted by', ngoDetails.by]].map(([label, value]) => (
             <div key={label}>
               <div style={{ fontSize: 9, color: THEME.MT, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
               <div style={{ fontSize: 12, color: THEME.NV, fontWeight: 600 }}>{value}</div>
@@ -68,7 +159,7 @@ export default function DashboardPage({ go }) {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {FINDINGS.map((finding) => {
+          {findingsState.map((finding) => {
             const Icon = finding.icon;
             const color = finding.status === "PASS" ? THEME.GR : finding.status === "FAIL" ? THEME.RD : THEME.AM;
             return (
@@ -87,9 +178,9 @@ export default function DashboardPage({ go }) {
                 </div>
                 <Bar v={finding.conf} />
                 <div style={{ marginTop: 9, fontSize: 11, color: THEME.MT, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{finding.reasoning}</div>
-                {finding.status === "FAIL" && <div style={{ marginTop: 8, background: "#FEE2E2", border: "1px solid #FCA5A5", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.RD }}>⚠ Action Required: Fund utilisation statement missing</div>}
-                {finding.route === "human" && finding.qStatus === "pending" && <div style={{ marginTop: 8, background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.AM }}>⟳ Pending review · {finding.officer}</div>}
-                {finding.route === "human" && finding.qStatus === "reviewed" && <div style={{ marginTop: 8, background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.GR }}>✓ Reviewed by {finding.officer} → {finding.determination}</div>}
+                {finding.status === "FAIL" && <div style={{ marginTop: 8, background: "#FEE2E2", border: "1px solid #FCA5A5", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.RD }}>⚠ Action Required: Critical compliance gap found.</div>}
+                {finding.route === "human" && finding.qStatus === "pending" && <div style={{ marginTop: 8, background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.AM }}>⟳ Pending review · Assigned to officer</div>}
+                {finding.route === "human" && finding.qStatus === "reviewed" && <div style={{ marginTop: 8, background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.GR }}>✓ Reviewed → {finding.determination}</div>}
               </Card>
             );
           })}

@@ -9,14 +9,52 @@ router = APIRouter()
 @router.get("/{submission_id}/findings")
 def get_findings(submission_id: str,
                  user: dict = Depends(get_current_user)):
+    import json
+    from pathlib import Path
+    from backend.store import FINDINGS, SUBMISSIONS
+    from backend.store import now as store_now
+
     sub = get_submission(submission_id)
+    findings = get_findings_for_submission(submission_id)
+
+    # Fallback to local JSON on disk if not found in memory (e.g. server restart)
+    json_path = Path("assessment_results") / f"{submission_id}.json"
+    if (not sub or not findings) and json_path.exists():
+        try:
+            with open(json_path, "r") as f:
+                cached = json.load(f)
+            
+            # Restore submission in store if missing
+            if not sub:
+                sub = {
+                    "id": submission_id,
+                    "org_name": "Cached NGO",
+                    "state": "maharashtra",
+                    "entity_type": "Public Trust",
+                    "status": "complete",
+                    "score": cached.get("score", {}),
+                    "created_at": store_now(),
+                    "updated_at": store_now()
+                }
+                SUBMISSIONS[submission_id] = sub
+            
+            # Restore findings in store if missing
+            cached_findings = cached.get("findings", [])
+            for f_item in cached_findings:
+                fid = f_item.get("id") or f_item.get("dimension_id")
+                if fid not in FINDINGS:
+                    FINDINGS[fid] = f_item
+            
+            findings = get_findings_for_submission(submission_id)
+        except Exception as e:
+            print(f"Error loading cached findings: {e}")
+
     if not sub:
         raise HTTPException(404, "Submission not found.")
     if sub["status"] not in ("complete", "processing"):
         raise HTTPException(400, "Assessment not yet run.")
 
-    findings  = get_findings_for_submission(submission_id)
-    score     = sub.get("score", {})
+    score = sub.get("score", {})
 
     return {
         "submission_id":   submission_id,

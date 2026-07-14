@@ -1,17 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { THEME, NGO, FINDINGS } from "@/lib/api";
+import { THEME, NGO, FINDINGS, getFindings } from "@/lib/api";
 import Crumb from "@/components/sections/Crumb";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Bar from "@/components/ui/Bar";
 
 export default function FindingsPage({ go }) {
-  const [open, setOpen] = useState(4);
+  const [findingsState, setFindingsState] = useState([]);
+  const [open, setOpen] = useState(null);
   const [filter, setFilter] = useState("All");
-  const shown = filter === "All" ? FINDINGS : FINDINGS.filter((finding) => finding.status === filter);
+
+  useEffect(() => {
+    const subId = localStorage.getItem("active_submission_id");
+    if (!subId) {
+      setFindingsState(FINDINGS);
+      return;
+    }
+
+    getFindings(subId)
+      .then((res) => {
+        const mapped = (res.findings || []).map((f) => ({
+          id: f.id,
+          dim: f.dimension_name,
+          dimension_id: f.dimension_id,
+          status: f.status,
+          conf: f.confidence,
+          route: f.routing === "human_review" ? "human" : "auto",
+          qStatus: f.human_determination ? "reviewed" : "pending",
+          officer: "Officer Ramesh K.",
+          role: "Sr. Compliance Officer",
+          determination: f.human_determination || null,
+          citation: f.legal_citation,
+          evidence: f.ngo_evidence,
+          reasoning: f.reasoning,
+          fix: f.status === "FAIL" ? "Submit the missing files to satisfy the relevant statutory requirement." : null,
+          reviewedAt: f.reviewed_at ? new Date(f.reviewed_at).toLocaleString() : ""
+        }));
+        setFindingsState(mapped.length ? mapped : FINDINGS);
+      })
+      .catch((err) => {
+        console.error("Error loading findings:", err);
+        setFindingsState(FINDINGS);
+      });
+  }, []);
+
+  const shown = filter === "All" ? findingsState : findingsState.filter((finding) => finding.status === filter);
 
   return (
     <div style={{ background: THEME.BG, minHeight: "100vh" }}>
@@ -20,7 +56,7 @@ export default function FindingsPage({ go }) {
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
           <div>
             <span style={{ fontSize: 14, fontWeight: 700, color: THEME.NV }}>{NGO.name}</span>
-            <span style={{ fontSize: 12, color: THEME.MT, marginLeft: 8 }}>· {NGO.state} · {NGO.type} · 7 dimensions</span>
+            <span style={{ fontSize: 12, color: THEME.MT, marginLeft: 8 }}>· 7 dimensions</span>
           </div>
           <div style={{ display: "flex", gap: 5 }}>
             {["All", "PASS", "FAIL", "UNCERTAIN"].map((option) => (
@@ -70,17 +106,17 @@ export default function FindingsPage({ go }) {
                     {finding.qStatus === "reviewed" && (
                       <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 7, padding: 12, marginBottom: 8 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                          <div style={{ fontSize: 10, fontWeight: 700, color: THEME.GR, textTransform: "uppercase" }}>Officer Determination: {finding.determination}</div>
+                           <div style={{ fontSize: 10, fontWeight: 700, color: THEME.GR, textTransform: "uppercase" }}>Officer Determination: {finding.determination}</div>
                           <span style={{ fontSize: 10, color: THEME.MT }}>{finding.reviewedAt}</span>
                         </div>
-                        <div style={{ fontSize: 12, color: THEME.TX, lineHeight: 1.6 }}>{finding.officerNotes}</div>
+                        <div style={{ fontSize: 12, color: THEME.TX, lineHeight: 1.6 }}>{finding.officerNotes || "No notes provided."}</div>
                         <div style={{ fontSize: 10, color: THEME.MT, marginTop: 4 }}>Reviewed by {finding.officer} · {finding.role}</div>
                       </div>
                     )}
                     {finding.status === "FAIL" && (
                       <div style={{ background: "#FEE2E2", border: "1px solid #FCA5A5", borderRadius: 7, padding: 12 }}>
                         <div style={{ fontSize: 10, fontWeight: 700, color: THEME.RD, textTransform: "uppercase", marginBottom: 5 }}>How to Resolve</div>
-                        <div style={{ fontSize: 12, color: THEME.RD, lineHeight: 1.6 }}>{finding.fix}</div>
+                        <div style={{ fontSize: 12, color: THEME.RD, lineHeight: 1.6 }}>{finding.fix || "Provide additional evidence demonstrating compliance to the registrar."}</div>
                       </div>
                     )}
                     {finding.route === "human" && finding.qStatus === "pending" && (

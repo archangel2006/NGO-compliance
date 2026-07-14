@@ -7,22 +7,70 @@ import ollama
 
 # Add project root to path
 import sys
-sys.path.append(str(Path(__file__).parent.parent.parent))
+backend_dir = Path(__file__).parent.parent
+sys.path.append(str(backend_dir.parent))
+
+from dotenv import load_dotenv
+load_dotenv(backend_dir / ".env")
 
 from corpus.corpus_config import CORPUS_CONFIG, REQUIRED_CORPUS
 from backend.utils.chunker import chunk_by_section
 
-CORPUS_ROOT    = Path("corpus/")
-METADATA_ROOT  = Path("corpus_metadata/")
-VECTORSTORE    = Path("vectorstore/")
-EMBED_MODEL    = "nomic-embed-text"
-COLLECTION     = "legal_corpus"
+env_vectorstore = os.getenv("VECTORSTORE_PATH")
+if env_vectorstore:
+    VECTORSTORE = (backend_dir / env_vectorstore).resolve()
+else:
+    VECTORSTORE = (backend_dir / "../vectorstore").resolve()
+
+env_corpus = os.getenv("CORPUS_ROOT")
+if env_corpus:
+    CORPUS_ROOT = (backend_dir / env_corpus).resolve()
+else:
+    CORPUS_ROOT = (backend_dir / "../corpus").resolve()
+
+env_metadata = os.getenv("METADATA_ROOT")
+if env_metadata:
+    METADATA_ROOT = (backend_dir / env_metadata).resolve()
+else:
+    METADATA_ROOT = (backend_dir / "../corpus_metadata").resolve()
+
+EMBED_MODEL  = os.getenv("EMBED_MODEL", "nomic-embed-text")
+COLLECTION   = "legal_corpus"
 
 chroma_client = chromadb.PersistentClient(path=str(VECTORSTORE))
-collection    = chroma_client.get_or_create_collection(
-    name=COLLECTION,
-    metadata={"hnsw:space": "cosine"}  # cosine similarity for legal text
-)
+
+# ── Dynamic Dimension Checks & Auto-recovery for Ingest ──
+existing_dim = None
+current_dim = None
+
+try:
+    test_embedding = ollama.embeddings(model=EMBED_MODEL, prompt="test")["embedding"]
+    current_dim = len(test_embedding)
+except Exception:
+    current_dim = 768
+
+try:
+    collection = chroma_client.get_or_create_collection(
+        name=COLLECTION,
+        metadata={"hnsw:space": "cosine"}
+    )
+    peek_result = collection.peek(limit=1)
+    if peek_result and peek_result.get("embeddings") and len(peek_result["embeddings"]) > 0:
+        existing_dim = len(peek_result["embeddings"][0])
+except Exception:
+    existing_dim = None
+
+if existing_dim is not None and current_dim is not None and existing_dim != current_dim:
+    print(f"\n[REBUILD-INGEST] Embedding dimension mismatch! Existing: {existing_dim}, Configured: {current_dim}")
+    print("Deleting and re-creating collection...")
+    try:
+        chroma_client.delete_collection(COLLECTION)
+    except Exception:
+        pass
+    collection = chroma_client.get_or_create_collection(
+        name=COLLECTION,
+        metadata={"hnsw:space": "cosine"}
+    )
 
 
 def extract_text_from_pdf(pdf_path: Path) -> str:

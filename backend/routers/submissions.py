@@ -38,7 +38,7 @@ def create_submission(body: SubmissionCreate,
         "year_of_incorporation":  body.year_of_incorporation,
         "darpan_id":              body.darpan_id,
         "status":                 "pending",
-        "submitted_by":           user["sub"],
+        "submitted_by":           user["sub"] if user else "officer@darpan.gov.in",
         "created_at":             now(),
         "updated_at":             now(),
     }
@@ -81,6 +81,8 @@ def upload_document(
 
     # Save file
     dest = UPLOAD_DIR / submission_id / f"{doc_type}_{file.filename}"
+    # Ensure directory exists
+    dest.parent.mkdir(parents=True, exist_ok=True)
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
 

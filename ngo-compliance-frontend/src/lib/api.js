@@ -313,3 +313,67 @@ export function getComplianceData() {
     THEME,
   };
 }
+
+import axios from "axios";
+
+const API_BASE = "http://localhost:8000";
+
+const api = axios.create({
+  baseURL: API_BASE,
+});
+
+export const createSubmission = async (data) => {
+  const res = await api.post("/submissions", data);
+  return res.data;
+};
+
+export const uploadDocument = async (submissionId, docType, file) => {
+  const formData = new FormData();
+  formData.append("doc_type", docType);
+  formData.append("file", file);
+  const res = await api.post(`/submissions/${submissionId}/documents`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
+export const assessSubmission = async (submissionId) => {
+  const res = await api.post(`/submissions/${submissionId}/assess`);
+  return res.data;
+};
+
+export const getSubmissionStatus = async (submissionId) => {
+  const res = await api.get(`/submissions/${submissionId}/status`);
+  return res.data;
+};
+
+export const getSubmissionDetails = async (submissionId) => {
+  const res = await api.get(`/submissions/${submissionId}`);
+  return res.data;
+};
+
+export const getFindings = async (submissionId) => {
+  const res = await api.get(`/submissions/${submissionId}/findings`);
+  return res.data;
+};
+
+export const getReport = async (submissionId) => {
+  const res = await api.get(`/submissions/${submissionId}/report`);
+  return res.data;
+};
+
+export const getQueue = async () => {
+  const res = await api.get("/queue");
+  return res.data;
+};
+
+export const revealQueueItem = async (queueId) => {
+  const res = await api.post(`/queue/${queueId}/reveal`);
+  return res.data;
+};
+
+export const determineQueueItem = async (queueId, determination, notes) => {
+  const res = await api.post(`/queue/${queueId}/determine`, { determination, notes });
+  return res.data;
+};
+

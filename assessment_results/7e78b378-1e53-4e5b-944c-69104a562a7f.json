@@ -1,0 +1,177 @@
+{
+  "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+  "findings": [
+    {
+      "id": "0faaa11f-208e-486a-8e00-177f7d938491",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for Registration & Legal Status in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    },
+    {
+      "id": "f19e01ec-2c24-4254-ae83-b88da79aae54",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for Governance Structure in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    },
+    {
+      "id": "1a7381a4-0715-412b-b5f1-fced4a56a8da",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for Membership Requirements in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    },
+    {
+      "id": "c0629ad7-2013-4948-bb43-4186f22fe8bc",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for Financial Compliance in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    },
+    {
+      "id": "cea69883-aa01-42e3-ad7f-aaf88c796b91",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for Tax Compliance (12A/80G) in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    },
+    {
+      "id": "3fd9750f-2118-40dd-8089-2665178c1829",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for FCRA Compliance in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    },
+    {
+      "id": "fae39e5d-a7ef-4576-a238-7e03aa6d5ac7",
+      "submission_id": "7e78b378-1e53-4e5b-944c-69104a562a7f",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "CORPUS_GAP",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "",
+      "reasoning": "No legal provisions found for Audit Requirements in dl. Add the relevant Act to the corpus.",
+      "routing": "corpus_alert",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-12T18:37:59.353397"
+    }
+  ],
+  "score": {
+    "overall_score": 50,
+    "label": "Partial Compliance \u2014 Significant Gaps",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "CORPUS_GAP",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      }
+    },
+    "pass_count": 0,
+    "fail_count": 0,
+    "uncertain_count": 0,
+    "corpus_gap_count": 7
+  }
+}

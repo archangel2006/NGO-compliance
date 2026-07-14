@@ -1,17 +1,94 @@
+import os
 import chromadb
 import ollama
 import json
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
+from dotenv import load_dotenv
 
-VECTORSTORE = Path("vectorstore/")
-EMBED_MODEL  = "nomic-embed-text"
-LLM_MODEL    = "mistral"
+# Resolve paths relative to the current file or environment variable
+backend_dir = Path(__file__).parent.parent
+load_dotenv(backend_dir / ".env")
+
+env_vectorstore = os.getenv("VECTORSTORE_PATH")
+if env_vectorstore:
+    VECTORSTORE = (backend_dir / env_vectorstore).resolve()
+else:
+    VECTORSTORE = (backend_dir / "../vectorstore").resolve()
+
+EMBED_MODEL  = os.getenv("EMBED_MODEL", "nomic-embed-text")
+LLM_MODEL    = os.getenv("LLM_MODEL", "mistral")
 COLLECTION   = "legal_corpus"
 
 chroma_client = chromadb.PersistentClient(path=str(VECTORSTORE))
-collection    = chroma_client.get_or_create_collection(COLLECTION)
+
+# ── Dynamic Dimension Checks & Auto-recovery ──
+existing_dim = None
+current_dim = None
+rebuilt = False
+
+# 1. Determine dimension of the current embedding model
+try:
+    test_embedding = ollama.embeddings(model=EMBED_MODEL, prompt="test")["embedding"]
+    current_dim = len(test_embedding)
+except Exception as e:
+    print(f"[WARN] Failed to peek current embedding model dimension: {e}. Defaulting to 768.")
+    current_dim = 768
+
+# 2. Get/create collection and check stored dimension
+try:
+    collection = chroma_client.get_or_create_collection(
+        name=COLLECTION,
+        metadata={"hnsw:space": "cosine"}
+    )
+    
+    # Peek at the database to fetch one document's embedding
+    peek_result = collection.peek(limit=1)
+    if peek_result and peek_result.get("embeddings") is not None and len(peek_result["embeddings"]) > 0:
+        existing_dim = len(peek_result["embeddings"][0])
+except Exception as e:
+    print(f"[WARN] Failed to read existing database dimension: {e}")
+    existing_dim = None
+
+# 3. Check for mismatches and auto-rebuild if dimensions differ
+if existing_dim is not None and current_dim is not None and existing_dim != current_dim:
+    print("\n" + "=" * 50)
+    print("WARNING: EMBEDDING DIMENSION MISMATCH DETECTED")
+    print(f"  Existing collection dimension: {existing_dim}")
+    print(f"  Configured model '{EMBED_MODEL}' dimension: {current_dim}")
+    print("Rebuilding collection to prevent query errors...")
+    print("=" * 50 + "\n")
+    
+    try:
+        chroma_client.delete_collection(COLLECTION)
+        collection = chroma_client.get_or_create_collection(
+            name=COLLECTION,
+            metadata={"hnsw:space": "cosine"}
+        )
+        
+        # Trigger ingestion
+        from backend.services.ingest import ingest_all
+        ingest_all()
+        rebuilt = True
+    except Exception as err:
+        print(f"[ERROR] Failed to rebuild vector database: {err}")
+        # Re-raise so backend doesn't run with corrupted DB
+        raise err
+else:
+    rebuilt = False
+
+# 4. Mandatory Log Output
+print("\n=== ChromaDB Embedding Initialization ===")
+print(f"Embedding model: {EMBED_MODEL}")
+print(f"Embedding dimension: {current_dim}")
+if existing_dim is not None:
+    print(f"Existing collection dimension: {existing_dim}")
+if rebuilt:
+    print("Status: Collection was rebuilt due to dimension mismatch.")
+else:
+    print("Status: Using existing vector database (dimensions match).")
+print("==========================================\n")
 
 # ── Compliance dimensions ─────────────────────────────────────────
 DIMENSIONS = [
@@ -96,7 +173,17 @@ def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
         model=EMBED_MODEL, prompt=query
     )["embedding"]
 
-    # Filter: get state-specific AND central docs
+    # Debug info requested by user
+    total_count = collection.count()
+    
+    # Raw query without filters to inspect what's available
+    raw_results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=n_results
+    )
+    raw_docs_count = len(raw_results["documents"][0]) if raw_results["documents"] else 0
+    
+    # Query with state filter
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results,
@@ -107,6 +194,24 @@ def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
             ]
         },
     )
+    filtered_docs_count = len(results["documents"][0]) if results["documents"] else 0
+
+    print(f"\n===== RAG Retrieval Debug =====")
+    print(f"Query: {query}")
+    print(f"State Input: {state}")
+    print(f"Embedding dimension: {len(query_embedding)}")
+    print(f"Collection count: {total_count}")
+    print(f"Raw retrieved docs (no filter): {raw_docs_count}")
+    if raw_docs_count > 0:
+        raw_states = [m.get("state") for m in raw_results["metadatas"][0]]
+        print(f"Raw doc states: {raw_states}")
+    print(f"After state filter: {filtered_docs_count}")
+    
+    combined = "\n\n---\n\n".join(results["documents"][0]) if filtered_docs_count > 0 else ""
+    print(f"Final legal context length: {len(combined)} chars")
+    if not combined.strip():
+        print(f"REASON WHY EMPTY: No documents matched state='{state}' or state='all'. Stored metadata states are likely different.")
+    print("================================\n")
 
     if not results["documents"] or not results["documents"][0]:
         return "", []
@@ -163,20 +268,39 @@ def validate_citation(citation: str, state: str) -> bool:
         return False
 
     # Search for the exact citation text
+    citation_embedding = ollama.embeddings(
+        model=EMBED_MODEL,
+        prompt=citation
+    )["embedding"]
+
     results = collection.query(
-        query_texts=[citation],
+        query_embeddings=[citation_embedding],
         n_results=3,
-        where={"$or": [{"state": state}, {"state": "all"}]}
+        where={
+            "$or":[
+                {"state":state},
+                {"state":"all"}
+            ]
+        }
     )
 
     if not results["documents"] or not results["documents"][0]:
         return False
 
-    # Check if the citation string appears in any retrieved chunk
-    for doc in results["documents"][0]:
-        if any(word in doc.lower() for word in citation.lower().split()[:3]):
+    # citation in any retrieved chunk
+    citation_lower = citation.lower()
+
+    for meta in results["metadatas"][0]:
+        act = meta.get("act_name", "").lower()
+        section = meta.get("section_ref", "").lower()
+
+        if act and act in citation_lower:
             return True
-    return False
+
+        if section and section in citation_lower:
+            return True
+
+        return False
 
 
 def assess_dimension(dimension: dict, ngo_json: dict,
@@ -184,13 +308,21 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     """
     Run full RAG + LLM assessment for one compliance dimension.
     """
+    STATE_MAP = {
+        "dl": "delhi",
+        "mh": "maharashtra",
+        "ka": "karnataka",
+        "rj": "rajasthan"
+    }
+    canonical_state = STATE_MAP.get(state.lower(), state.lower())
+
     # 1. Build retrieval query
     query = dimension["query"].format(
-        state=state, entity_type=entity_type
+        state=canonical_state, entity_type=entity_type
     )
 
     # 2. Retrieve legal context
-    legal_context, retrieved_citations = retrieve_legal_context(query, state)
+    legal_context, retrieved_citations = retrieve_legal_context(query, canonical_state)
 
     # 3. Handle corpus gap
     if not legal_context.strip():
@@ -202,7 +334,7 @@ def assess_dimension(dimension: dict, ngo_json: dict,
             legal_citation="",
             ngo_evidence="",
             reasoning=f"No legal provisions found for {dimension['name']} "
-                      f"in {state}. Add the relevant Act to the corpus.",
+                      f"in {canonical_state}. Add the relevant Act to the corpus.",
             routing="corpus_alert",
             citation_valid=False,
         )
@@ -212,7 +344,7 @@ def assess_dimension(dimension: dict, ngo_json: dict,
 
     # 5. Call LLM
     prompt = build_prompt(dimension, legal_context, ngo_evidence,
-                          state, entity_type)
+                          canonical_state, entity_type)
 
     raw = ollama.generate(
         model=LLM_MODEL,
@@ -225,7 +357,7 @@ def assess_dimension(dimension: dict, ngo_json: dict,
 
     # 7. Validate citation
     citation = result.get("legal_citation", "")
-    citation_valid = validate_citation(citation, state)
+    citation_valid = validate_citation(citation, canonical_state)
 
     if not citation_valid and result.get("status") in ("PASS", "FAIL"):
         result["status"] = "UNCERTAIN"
