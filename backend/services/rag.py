@@ -1,16 +1,20 @@
 import os
 import chromadb
 import ollama
+import google.generativeai as genai
+from backend.services.llm import generate
 import json
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
 from dotenv import load_dotenv
-import httpx
+
 
 # Resolve paths relative to the current file or environment variable
 backend_dir = Path(__file__).parent.parent
 load_dotenv(backend_dir / ".env")
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 env_vectorstore = os.getenv("VECTORSTORE_PATH")
 if env_vectorstore:
@@ -19,18 +23,8 @@ else:
     VECTORSTORE = (backend_dir / "../vectorstore").resolve()
 
 EMBED_MODEL  = os.getenv("EMBED_MODEL", "nomic-embed-text")
-LLM_MODEL    = os.getenv("LLM_MODEL", "mistral")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
 COLLECTION   = "legal_corpus"
-
-# --- Ollama client with explicit timeout so generate/embeddings never hang ---
-# LLM_TIMEOUT: 5 min default — Mistral 7B on a large legal prompt can take 2-5 min
-# on CPU-only or low-VRAM machines. Set OLLAMA_TIMEOUT in .env to override.
-LLM_TIMEOUT  = int(os.getenv("OLLAMA_TIMEOUT", "300"))
-_ollama = ollama.Client(
-    host=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
-    timeout=httpx.Timeout(LLM_TIMEOUT, connect=10.0),
-)
-print(f"[RAG] Ollama client ready — model: {LLM_MODEL}, timeout: {LLM_TIMEOUT}s")
 
 chroma_client = chromadb.PersistentClient(path=str(VECTORSTORE))
 
@@ -41,7 +35,7 @@ rebuilt = False
 
 # 1. Determine dimension of the current embedding model
 try:
-    test_embedding = _ollama.embeddings(model=EMBED_MODEL, prompt="test")["embedding"]
+    test_embedding = ollama.embeddings(model=EMBED_MODEL, prompt="test")["embedding"]
     current_dim = len(test_embedding)
 except Exception as e:
     print(f"[WARN] Failed to peek current embedding model dimension: {e}. Defaulting to 768.")
@@ -243,7 +237,7 @@ def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
     Returns (chunks: list[str], metadatas: list[dict]).
     The caller selects the top chunk (index 0) for the prompt.
     """
-    query_embedding = _ollama.embeddings(
+    query_embedding = ollama.embeddings(
         model=EMBED_MODEL, prompt=query
     )["embedding"]
 
@@ -413,7 +407,7 @@ def validate_citation(citation: str, state: str,
 
     # Slow path: embed and search corpus
     try:
-        citation_embedding = _ollama.embeddings(
+        citation_embedding = ollama.embeddings(
             model=EMBED_MODEL,
             prompt=citation
         )["embedding"]
@@ -498,19 +492,17 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         consistency_issues=consistency_issues,
     )
 
-    print(f"[RAG] Calling Ollama LLM for dimension '{dimension['id']}' "
-          f"(model={LLM_MODEL}, prompt={len(prompt)} chars, timeout={LLM_TIMEOUT}s)...")
     try:
-        resp = _ollama.generate(
-            model=LLM_MODEL,
-            prompt=prompt,
-            stream=False,
-            options={"temperature": 0.1},
+        print(f"[RAG] Calling Gemini for '{dimension['id']}'")
+
+        raw = generate(
+            prompt,
+            system=None,
+            expect_json=True
         )
-        raw = resp.response if hasattr(resp, "response") else resp["response"]
-        print(f"[RAG] LLM responded for '{dimension['id']}' - {len(raw)} chars")
-    except httpx.TimeoutException:
-        print(f"[RAG] TIMEOUT for '{dimension['id']}' after {LLM_TIMEOUT}s.")
+
+    except Exception as e:
+
         return Finding(
             dimension_id=dimension["id"],
             dimension_name=dimension["name"],
@@ -518,21 +510,7 @@ def assess_dimension(dimension: dict, ngo_json: dict,
             confidence=0.0,
             legal_citation="",
             ngo_evidence=ngo_evidence,
-            reasoning=f"LLM timed out after {LLM_TIMEOUT}s.",
-            routing="human_review",
-            citation_valid=False,
-            raw_llm_output=None,
-        )
-    except Exception as llm_err:
-        print(f"[RAG] ERROR for '{dimension['id']}': {llm_err}")
-        return Finding(
-            dimension_id=dimension["id"],
-            dimension_name=dimension["name"],
-            status="UNCERTAIN",
-            confidence=0.0,
-            legal_citation="",
-            ngo_evidence=ngo_evidence,
-            reasoning=f"LLM call failed: {llm_err}",
+            reasoning=f"LLM call failed: {e}",
             routing="human_review",
             citation_valid=False,
             raw_llm_output=None,

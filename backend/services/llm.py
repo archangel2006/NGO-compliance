@@ -1,13 +1,19 @@
 import json
 import re
-import ollama
+import google.generativeai as genai
 from typing import Optional
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv()
 
-LLM_MODEL   = os.getenv("LLM_MODEL", "mistral")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+
 TEMPERATURE = 0.1   # low temp — legal reasoning needs consistency
 
 
@@ -15,26 +21,39 @@ TEMPERATURE = 0.1   # low temp — legal reasoning needs consistency
 
 def generate(prompt: str, system: Optional[str] = None,
              expect_json: bool = True) -> str:
-    """
-    Raw LLM call. Returns string response.
-    All other functions in this module call this.
-    """
-    messages = []
+
+    full_prompt = ""
     if system:
-        messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": prompt})
+        full_prompt += system + "\n\n"
+    full_prompt += prompt
 
-    response = ollama.chat(
-        model=LLM_MODEL,
-        messages=messages,
-        options={
-            "temperature": TEMPERATURE,
-            "num_predict": 1024,   # cap output length — compliance answers are short
-        },
-        format="json" if expect_json else "",
-    )
-    return response["message"]["content"]
+    MODELS = [
+        os.getenv("LLM_MODEL", "gemini-2.5-flash"),
+    ]
 
+    last_error = None
+
+    for model_name in MODELS:
+        try:
+            print(f"[LLM] Trying {model_name}...")
+
+            model = genai.GenerativeModel(model_name)
+
+            response = model.generate_content(
+                full_prompt,
+                generation_config={
+                    "temperature": TEMPERATURE,
+                }
+            )
+
+            print(f"[LLM] Using {model_name}")
+            return response.text
+
+        except Exception as e:
+            print(f"[LLM] {model_name} failed: {e}")
+            last_error = e
+
+    raise Exception(f"All Gemini models failed. Last error: {last_error}")
 
 # ── JSON parsing (handles common LLM output failures) ────────────
 
@@ -155,17 +174,25 @@ legal provisions. Return ONLY a JSON array of strings:
 
 # ── Quick health check ────────────────────────────────────────────
 
-def check_llm_available() -> dict:
-    """Test Ollama is running and model is loaded."""
+def check_llm_available():
+    """Check Gemini API connectivity."""
+
     try:
-        response = ollama.chat(
-            model=LLM_MODEL,
-            messages=[{"role": "user",
-                       "content": 'Reply with {"status":"ok"}'}],
-            options={"temperature": 0, "num_predict": 20},
-            format="json",
+        model = genai.GenerativeModel(LLM_MODEL)
+
+        response = model.generate_content(
+            'Reply only with {"status":"ok"}'
         )
-        return {"available": True, "model": LLM_MODEL,
-                "response": response["message"]["content"]}
+
+        return {
+            "available": True,
+            "model": LLM_MODEL,
+            "response": response.text
+        }
+
     except Exception as e:
-        return {"available": False, "model": LLM_MODEL, "error": str(e)}
+        return {
+            "available": False,
+            "model": LLM_MODEL,
+            "error": str(e)
+        }

@@ -26,3 +26,7 @@ weasyprint
 # Utilities
 pydantic
 httpx
+
+# External llms
+google-genai
+google-generativeai

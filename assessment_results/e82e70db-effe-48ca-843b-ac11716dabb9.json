@@ -1,0 +1,177 @@
+{
+  "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+  "findings": [
+    {
+      "id": "0d2c4b01-2a52-41b2-a3a5-84644435735c",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- registration_number: KAR-BLR-2018-05512\n- registering_authority: OF SOCIETIES / PUBLIC TRUSTS\n- act_registered_under: the Karnataka Registration of Societies Act, 1960\n- date_of_registration: 09/01/2018\n- state_of_registration: Registration",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 40.604300241s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.5-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 40\n}\n]",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    },
+    {
+      "id": "63886d46-d45f-4d7b-89b2-9f544c90adbd",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- trustee_names: ['Arjun Reddy', 'Krishna Reddy', 'Meera Nair', 'Suresh Iyer', 'Ramaswamy Iyer', 'JURISDICTION']\n- trustee_count: 6\n- quorum: The\n- dissolution_clause_present: True",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 404 This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    },
+    {
+      "id": "ec7a7dae-6bf2-42d6-9896-91a28f86660d",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- trustee_count: 6\n- trustee_names: ['Arjun Reddy', 'Krishna Reddy', 'Meera Nair', 'Suresh Iyer', 'Ramaswamy Iyer', 'JURISDICTION']",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 404 This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    },
+    {
+      "id": "d84f0de6-8613-4d36-bfb2-5d56289cc21a",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- financial_year: 2023-24\n- total_receipts: 1920000\n- total_expenditure: 1335000",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 38.718153385s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.5-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 38\n}\n]",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    },
+    {
+      "id": "0050fb79-7550-45e0-92e2-734fde75290f",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- cert_12a_number: IT-12AB-BLR-2019-2201\n- cert_80g_number: IT-80G-BLR-2019-6650\n- valid_from: 01/04/2019\n- valid_until: 31/03/2024\n- pan: AABCT9021P",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 38.23140898s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.5-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 38\n}\n]",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    },
+    {
+      "id": "205aa9c8-0ac5-4305-9678-6861a94d10cc",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- fcra_reg_number: 094650218\n- valid_until: 31/03/2024\n- bank_account: 0512004500218\n- bank_branch: Bengaluru Main Branch",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 37.761072187s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.5-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 37\n}\n]",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    },
+    {
+      "id": "93127de9-a878-4c83-a7af-b39600928f8e",
+      "submission_id": "e82e70db-effe-48ca-843b-ac11716dabb9",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.0,
+      "legal_citation": "",
+      "ngo_evidence": "- auditor_icai: 098214\n- audit_period: 31 March 2024",
+      "reasoning": "LLM call failed: All Gemini models failed. Last error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 37.272557941s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.5-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 37\n}\n]",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": null,
+      "created_at": "2026-07-15T18:38:23.058947"
+    }
+  ],
+  "score": {
+    "overall_score": 50,
+    "label": "Partial Compliance \u2014 Significant Gaps",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.0,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      }
+    },
+    "pass_count": 0,
+    "fail_count": 0,
+    "uncertain_count": 7,
+    "corpus_gap_count": 0
+  }
+}
