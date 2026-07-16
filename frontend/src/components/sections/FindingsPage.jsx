@@ -104,9 +104,17 @@ export default function FindingsPage({ go }) {
                       </div>
                     </div>
                     {finding.qStatus === "reviewed" && (
-                      <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 7, padding: 12, marginBottom: 8 }}>
+                      <div style={{
+                        background: finding.determination === "PASS" ? "#ECFDF5" : "#FEE2E2",
+                        border: `1px solid ${finding.determination === "PASS" ? "#A7F3D0" : "#FCA5A5"}`,
+                        borderRadius: 7,
+                        padding: 12,
+                        marginBottom: 8
+                      }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                           <div style={{ fontSize: 10, fontWeight: 700, color: THEME.GR, textTransform: "uppercase" }}>Officer Determination: {finding.determination}</div>
+                           <div style={{ fontSize: 10, fontWeight: 700, color: finding.determination === "PASS" ? THEME.GR : THEME.RD, textTransform: "uppercase" }}>
+                             Officer Determination: {finding.determination}
+                           </div>
                           <span style={{ fontSize: 10, color: THEME.MT }}>{finding.reviewedAt}</span>
                         </div>
                         <div style={{ fontSize: 12, color: THEME.TX, lineHeight: 1.6 }}>{finding.officerNotes || "No notes provided."}</div>

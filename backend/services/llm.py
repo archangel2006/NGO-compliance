@@ -27,15 +27,25 @@ def generate(prompt: str, system: Optional[str] = None,
         full_prompt += system + "\n\n"
     full_prompt += prompt
 
-    MODELS = [
-        os.getenv("LLM_MODEL", "gemini-2.5-flash"),
+    env_model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+    fallback_candidates = [
+        "gemini-3.5-flash",
+        "gemini-3.1-flash-lite",
+        "gemini-flash-latest",
+        "gemini-pro-latest"
     ]
+    MODELS = []
+    if env_model:
+        MODELS.append(env_model)
+    for m in fallback_candidates:
+        if m not in MODELS:
+            MODELS.append(m)
 
     last_error = None
 
     for model_name in MODELS:
         try:
-            print(f"[LLM] Trying {model_name}...")
+            print(f"[LLM] Trying model {model_name}...")
 
             model = genai.GenerativeModel(model_name)
 
@@ -46,11 +56,11 @@ def generate(prompt: str, system: Optional[str] = None,
                 }
             )
 
-            print(f"[LLM] Using {model_name}")
+            print(f"[LLM] Successfully generated using {model_name}")
             return response.text
 
         except Exception as e:
-            print(f"[LLM] {model_name} failed: {e}")
+            print(f"[LLM] Model {model_name} failed: {e}")
             last_error = e
 
     raise Exception(f"All Gemini models failed. Last error: {last_error}")

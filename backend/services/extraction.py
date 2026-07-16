@@ -95,14 +95,55 @@ def _ner_extract(text: str, fields: list) -> dict:
     result = {}
 
     if "trustee_names" in fields or "office_bearers" in fields:
-        persons = [e.text for e in doc.ents if e.label_ == "PERSON"]
+        # Collect location/place tokens to exclude from person names
+        location_texts = {
+            e.text.strip()
+            for e in doc.ents
+            if e.label_ in ("GPE", "LOC", "FAC", "ORG")
+        }
+        # spaCy sometimes marks person names as ORG and vice-versa;
+        # also apply a simple heuristic: reject tokens that are purely
+        # uppercase abbreviations or have digits (not person names)
+        _PERSON_BLOCKLIST = {
+            "india", "mumbai", "delhi", "bangalore", "bengaluru",
+            "hyderabad", "chennai", "kolkata", "pune", "ahmedabad",
+            "government", "ministry", "department", "office", "commissioner",
+            "registrar", "district", "court", "division", "zone",
+        }
+        persons = []
+        for e in doc.ents:
+            if e.label_ != "PERSON":
+                continue
+            name = e.text.strip()
+            if not name:
+                continue
+            # Skip if this text is also classified as a location
+            if name in location_texts:
+                continue
+            # Skip if any token is in blocklist
+            if any(tok.lower() in _PERSON_BLOCKLIST for tok in name.split()):
+                continue
+            # Skip single-word names that are all-caps and short (abbreviations)
+            if len(name.split()) == 1 and name.isupper() and len(name) <= 4:
+                continue
+            persons.append(name)
+
         result["trustee_names"] = list(dict.fromkeys(persons))[:20]
         result["trustee_count"] = len(result["trustee_names"])
 
     if "org_name" in fields:
-        orgs = [e.text for e in doc.ents if e.label_ == "ORG"]
-        if orgs:
-            result["ner_org_name"] = orgs[0]
+        _AUTHORITY_MARKERS = [
+            "income tax", "government of india", "ministry", "department",
+            "office of the", "principal commissioner", "commissioner",
+            "charity commissioner", "registrar", "mha", "niti",
+        ]
+        orgs = [e.text.strip() for e in doc.ents if e.label_ == "ORG"]
+        for org in orgs:
+            org_lower = org.lower()
+            if any(marker in org_lower for marker in _AUTHORITY_MARKERS):
+                continue  # Skip issuing authorities
+            result["ner_org_name"] = org
+            break  # take first non-authority ORG
 
     if "grant_sources" in fields:
         result["grant_sources"] = [

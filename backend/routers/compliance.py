@@ -74,7 +74,7 @@ def _run_assessment(submission_id: str):
 
         # ── STEP 3: RAG + LLM per dimension ────────────────────────
         SUBMISSIONS[submission_id]["progress_step"] = 5
-        findings = run_full_assessment(merged, state, entity_type)
+        findings = run_full_assessment(merged, state, entity_type, sub["org_name"])
 
         SUBMISSIONS[submission_id]["progress_step"] = 6
         for f in findings:

@@ -1,4 +1,5 @@
 import os
+import re
 import chromadb
 import ollama
 import google.generativeai as genai
@@ -112,7 +113,7 @@ DIMENSIONS = [
             "date_of_registration",
             "state_of_registration",
         ],
-        "dimension_consistency_keys": ["org_name", "registration_number", "date_of_registration"],
+        "dimension_consistency_keys": ["org_name"],
         "weight": 0.20,
     },
     {
@@ -157,7 +158,7 @@ DIMENSIONS = [
             "govt_grant_present",
             "fund_utilisation_present",
         ],
-        "dimension_consistency_keys": ["org_name"],
+        "dimension_consistency_keys": [],
         "weight": 0.20,
     },
     {
@@ -196,7 +197,7 @@ DIMENSIONS = [
             "sbi_designated_account",
         ],
         # fcra_reg_number and bank_account have only one source key — no consistency check possible
-        "dimension_consistency_keys": ["org_name"],
+        "dimension_consistency_keys": [],
         "weight": 0.10,
     },
     {
@@ -260,6 +261,83 @@ def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
     metas   = results["metadatas"][0]
     print(f"[RAG] Retrieved {len(chunks)} chunks for state='{state}'")
     return chunks, metas
+
+
+def build_combined_prompt(active_dimensions: dict, state: str, entity_type: str) -> str:
+    """
+    Build a single consolidated prompt to assess all active compliance categories simultaneously.
+    Uses strict XML-like boundary tags to ensure independent reasoning per dimension and prevent leakage.
+    """
+    categories_str = []
+    for dim_id, data in active_dimensions.items():
+        dim = data["dimension"]
+        top_chunk = data["top_chunk"]
+        ngo_evidence = data["ngo_evidence"]
+        consistency_issues = data["dim_issues"]
+
+        consistency_block = ""
+        if consistency_issues:
+            issue_lines = "\n".join(f"- {issue}" for issue in consistency_issues)
+            consistency_block = f"""
+  <consistency_issues>
+{issue_lines}
+  </consistency_issues>"""
+
+        special_rules = ""
+        if dim_id == "registration":
+            special_rules = (
+                "\n  - Do not automatically return FAIL solely because 'Registration Act, 1908' "
+                "appears in the evidence (it is common in property docs)."
+                "\n  - Only return FAIL if evidence clearly establishes non-compliance."
+                "\n  - If registration evidence is ambiguous or insufficient, return UNCERTAIN."
+            )
+
+        categories_str.append(f"""<dimension id="{dim_id}">
+  <name>{dim['name']}</name>
+  <legal_provision>
+{top_chunk}
+  </legal_provision>
+  <ngo_evidence>
+{ngo_evidence}
+  </ngo_evidence>{consistency_block}
+  <assessment_rules>{special_rules}
+  </assessment_rules>
+</dimension>""")
+
+    categories_joined = "\n\n".join(categories_str)
+    dim_keys_str = ", ".join(f'"{k}"' for k in active_dimensions.keys())
+
+    return f"""You are a senior legal compliance officer reviewing NGO documents for India.
+
+STATE: {state} | ENTITY TYPE: {entity_type}
+
+Please evaluate the compliance categories enclosed in the <dimension> tags below:
+
+{categories_joined}
+
+TASK: Evaluate each dimension independently.
+
+STRICT ISOLATION RULES:
+1. Evaluate every dimension strictly independently inside its own tag boundaries.
+2. Never reuse evidence across dimensions.
+3. Never reuse legal provisions across dimensions.
+4. Never let a failure or inconsistency in one dimension affect another.
+5. Apply only the legal requirements relevant to the stated ENTITY TYPE ({entity_type}). Do not apply Society Act rules to Trusts, or Trust rules to Section 8 companies.
+6. PASS: evidence is present and clearly satisfies the legal provision.
+7. FAIL: evidence contradicts the provision; OR a consistency issue listed under that dimension affects the fields for that dimension.
+8. UNCERTAIN: evidence is absent or ambiguous. Do NOT assume compliance from missing data.
+9. Keep reasoning concise and specific (1-3 sentences referencing actual field values).
+
+Return ONLY valid JSON matching the following schema structure, with no other text before or after:
+{{
+  "registration": {{
+    "status": "PASS" or "FAIL" or "UNCERTAIN",
+    "legal_citation": "exact act name and section from the provision above",
+    "ngo_evidence": "the specific field and value that determined the verdict",
+    "reasoning": "concise explanation referencing specific field values"
+  }},
+  ... (include keys for all requested category IDs: {dim_keys_str})
+}}"""
 
 
 def build_prompt(dimension: dict, top_chunk: str, ngo_evidence: str,
@@ -331,37 +409,50 @@ _CONSISTENCY_FIELDS: dict = {
 }
 
 
-def check_consistency(ngo_json: dict) -> dict:
+def check_consistency(ngo_json: dict, submitted_org_name: str) -> dict:
     """
-    Detect cross-document field contradictions in the merged extraction dict.
-
-    Returns a dict mapping canonical_label -> list[str] of issue strings.
-    The outer dict is keyed so that each dimension can cheaply filter only its own issues.
-    Example: {"org_name": ["org_name inconsistent: 'ABC Trust' (org_name) vs 'ABC Foundation' (org_name_pan)."]}
+    Detect cross-document field contradictions.
+    Verifies that extracted organization names match the canonical submitted name.
     """
     all_issues: dict = {canonical: [] for canonical in _CONSISTENCY_FIELDS}
 
     def _norm(s: str) -> str:
-        return " ".join(s.lower().split())
+        # Strip punctuation and normalise whitespace
+        cleaned = re.sub(r'[^a-z0-9\s]', ' ', s.lower())
+        return " ".join(cleaned.split())
+
+    norm_submitted = _norm(submitted_org_name)
 
     for canonical, keys in _CONSISTENCY_FIELDS.items():
-        # Collect all non-None, non-empty values for this logical field
-        seen: list[tuple[str, str]] = []   # [(key, raw_value), ...]
-        for k in keys:
-            v = ngo_json.get(k)
-            if v and str(v).strip():
-                seen.append((k, str(v).strip()))
+        if canonical == "org_name":
+            # Compare extracted org names against the canonical submitted name
+            for k in keys:
+                extracted = ngo_json.get(k)
+                if extracted and str(extracted).strip():
+                    norm_extracted = _norm(str(extracted))
+                    # Check if they are reasonably similar (substring match in either direction)
+                    # to account for "ABC Trust" vs "The ABC Trust"
+                    if norm_extracted not in norm_submitted and norm_submitted not in norm_extracted:
+                        all_issues[canonical].append(
+                            f"Organisation name mismatch: Uploaded document shows '{extracted}' "
+                            f"which does not match the submitted name '{submitted_org_name}'."
+                        )
+        else:
+            # For any future multi-key consistency fields
+            seen: list[tuple[str, str]] = []
+            for k in keys:
+                v = ngo_json.get(k)
+                if v and str(v).strip():
+                    seen.append((k, str(v).strip()))
 
-        if len(seen) < 2:
-            continue   # only one source — nothing to compare
-
-        base_key, base_val = seen[0]
-        for other_key, other_val in seen[1:]:
-            if _norm(base_val) != _norm(other_val):
-                all_issues[canonical].append(
-                    f"{canonical} inconsistent: "
-                    f"'{base_val}' ({base_key}) vs '{other_val}' ({other_key})."
-                )
+            if len(seen) > 1:
+                base_key, base_val = seen[0]
+                for other_key, other_val in seen[1:]:
+                    if _norm(base_val) != _norm(other_val):
+                        all_issues[canonical].append(
+                            f"{canonical} inconsistent: "
+                            f"'{base_val}' ({base_key}) vs '{other_val}' ({other_key})."
+                        )
 
     return all_issues
 
@@ -379,30 +470,72 @@ def _filter_consistency_issues(all_issues: dict, dimension: dict) -> list:
     return filtered
 
 
+# Common abbreviation / synonym pairs used in LLM citations
+_CITATION_ALIASES = [
+    # LLM shorthand           corpus full name fragment
+    ("fcra",                  "foreign contribution"),
+    ("foreign contribution",  "fcra"),
+    ("income tax act",        "income tax act, 1961"),
+    ("income tax act, 1961",  "income tax act"),
+    ("societies registration","societies registration act"),
+    ("societies act",         "societies registration act"),
+    ("bpt act",               "bombay public trusts"),
+    ("bombay public trusts",  "bpt act"),
+    ("foreign contribution regulation act", "foreign contribution (regulation) act"),
+    ("fcra, 2010",            "foreign contribution"),
+    ("fcra 2010",             "foreign contribution"),
+]
+
+
+def _citation_tokens(text: str) -> set:
+    """Return normalised word tokens from a citation string."""
+    # strip punctuation, lowercase, split
+    cleaned = re.sub(r'[^a-z0-9\s]', ' ', text.lower())
+    return set(cleaned.split())
+
+
+def _citations_overlap(a: str, b: str) -> bool:
+    """True when a is substring of b, OR b is substring of a (bidirectional)."""
+    return (a in b) or (b in a)
+
+
 def validate_citation(citation: str, state: str,
                        chunk_meta: Optional[dict] = None) -> bool:
     """
     Check if the cited section actually exists in ChromaDB corpus.
     Prevents hallucinated citations from reaching the report.
 
-    chunk_meta: optional metadata dict of the chunk used to build the prompt.
-    If the LLM's citation matches this chunk's act_name, we validate immediately
-    without an extra ChromaDB round-trip.
+    Uses bidirectional substring matching + abbreviation aliases so that
+    a citation like 'Income Tax Act' still validates against a chunk whose
+    act_name is 'Income Tax Act, 1961', and vice-versa.
     """
     if not citation or len(citation) < 5:
         return False
 
-    citation_lower = citation.lower()
+    citation_lower = re.sub(r'[^a-z0-9\s]', ' ', citation.lower()).strip()
+
+    def _matches_corpus_entry(act: str, section: str) -> bool:
+        act_n = re.sub(r'[^a-z0-9\s]', ' ', act).strip()
+        sec_n = re.sub(r'[^a-z0-9\s]', ' ', section).strip()
+        # Direct bidirectional substring check
+        if act_n and _citations_overlap(act_n, citation_lower):
+            return True
+        if sec_n and _citations_overlap(sec_n, citation_lower):
+            return True
+        # Alias expansion: check if any known alias of the citation matches
+        for llm_form, corpus_form in _CITATION_ALIASES:
+            if llm_form in citation_lower and corpus_form in act_n:
+                return True
+            if corpus_form in citation_lower and llm_form in act_n:
+                return True
+        return False
 
     # Fast path: check against the chunk we actually fed to the model
     if chunk_meta:
-        act = chunk_meta.get("act_name", "").lower()
+        act     = chunk_meta.get("act_name", "").lower()
         section = chunk_meta.get("section_ref", "").lower()
-        if act and act in citation_lower:
+        if _matches_corpus_entry(act, section):
             print(f"[RAG] Citation validated via prompt chunk: '{act}'")
-            return True
-        if section and section in citation_lower:
-            print(f"[RAG] Citation validated via prompt chunk section: '{section}'")
             return True
 
     # Slow path: embed and search corpus
@@ -417,7 +550,7 @@ def validate_citation(citation: str, state: str,
 
     results = collection.query(
         query_embeddings=[citation_embedding],
-        n_results=3,
+        n_results=5,
         where={
             "$or": [
                 {"state": state},
@@ -432,9 +565,7 @@ def validate_citation(citation: str, state: str,
     for meta in results["metadatas"][0]:
         act     = meta.get("act_name", "").lower()
         section = meta.get("section_ref", "").lower()
-        if act and act in citation_lower:
-            return True
-        if section and section in citation_lower:
+        if _matches_corpus_entry(act, section):
             return True
 
     return False
@@ -442,7 +573,11 @@ def validate_citation(citation: str, state: str,
 
 def assess_dimension(dimension: dict, ngo_json: dict,
                      state: str, entity_type: str,
-                     consistency_issues: list | None = None) -> Finding:
+                     consistency_issues: list | None = None,
+                     precomputed_result: dict | None = None,
+                     raw_llm_output: str | None = None,
+                     top_chunk: str | None = None,
+                     top_meta: dict | None = None) -> Finding:
     """
     Run full RAG + LLM assessment for one compliance dimension.
     Uses the top-1 retrieved legal chunk and a focused, compact prompt.
@@ -456,79 +591,82 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     }
     canonical_state = STATE_MAP.get(state.lower(), state.lower())
 
-    # 1. Build retrieval query
-    query = dimension["query"].format(
-        state=canonical_state, entity_type=entity_type
-    )
-
-    # 2. Retrieve top-1 legal chunk
-    chunks, metas = retrieve_legal_context(query, canonical_state)
-
-    # 3. Handle corpus gap
-    if not chunks:
-        return Finding(
-            dimension_id=dimension["id"],
-            dimension_name=dimension["name"],
-            status="CORPUS_GAP",
-            confidence=0.0,
-            legal_citation="",
-            ngo_evidence="",
-            reasoning=f"No legal provisions found for {dimension['name']} "
-                      f"in {canonical_state}. Add the relevant Act to the corpus.",
-            routing="corpus_alert",
-            citation_valid=False,
-        )
-
-    top_chunk = chunks[0]
-    top_meta  = metas[0] if metas else {}
-
-    # 4. Build evidence string from fields the extractor actually produces
+    # Build/extract evidence fields first
     ngo_evidence = extract_evidence(ngo_json, dimension["evidence_fields"])
 
-    # 5. Build focused prompt (with optional consistency issues)
-    prompt = build_prompt(
-        dimension, top_chunk, ngo_evidence,
-        canonical_state, entity_type,
-        consistency_issues=consistency_issues,
-    )
+    # 1. Retrieve context if not provided precomputed
+    if top_chunk is None:
+        query = dimension["query"].format(
+            state=canonical_state, entity_type=entity_type
+        )
+        chunks, metas = retrieve_legal_context(query, canonical_state)
+        if not chunks:
+            return Finding(
+                dimension_id=dimension["id"],
+                dimension_name=dimension["name"],
+                status="CORPUS_GAP",
+                confidence=0.0,
+                legal_citation="",
+                ngo_evidence="",
+                reasoning=f"No legal provisions found for {dimension['name']} "
+                          f"in {canonical_state}. Add the relevant Act to the corpus.",
+                routing="corpus_alert",
+                citation_valid=False,
+            )
+        top_chunk = chunks[0]
+        top_meta  = metas[0] if metas else {}
 
-    try:
-        print(f"[RAG] Calling Gemini for '{dimension['id']}'")
-
-        raw = generate(
-            prompt,
-            system=None,
-            expect_json=True
+    if precomputed_result is not None:
+        result = precomputed_result
+        raw = raw_llm_output
+    else:
+        # Fallback to single-call logic
+        prompt = build_prompt(
+            dimension, top_chunk, ngo_evidence,
+            canonical_state, entity_type,
+            consistency_issues=consistency_issues,
         )
 
-    except Exception as e:
-
-        return Finding(
-            dimension_id=dimension["id"],
-            dimension_name=dimension["name"],
-            status="UNCERTAIN",
-            confidence=0.0,
-            legal_citation="",
-            ngo_evidence=ngo_evidence,
-            reasoning=f"LLM call failed: {e}",
-            routing="human_review",
-            citation_valid=False,
-            raw_llm_output=None,
-        )
-
-    # 6. Parse JSON output — confidence field is intentionally ignored below
-    result = safe_parse_json(raw)
+        print(f"[RAG] Calling Gemini for dimension '{dimension['id']}' "
+              f"(model={LLM_MODEL}, prompt={len(prompt)} chars)...")
+        try:
+            raw = generate(
+                prompt,
+                system=None,
+                expect_json=True
+            )
+            result = safe_parse_json(raw)
+        except Exception as e:
+            return Finding(
+                dimension_id=dimension["id"],
+                dimension_name=dimension["name"],
+                status="UNCERTAIN",
+                confidence=0.0,
+                legal_citation="",
+                ngo_evidence=ngo_evidence,
+                reasoning=f"LLM call failed: {e}",
+                routing="human_review",
+                citation_valid=False,
+                raw_llm_output=None,
+            )
 
     llm_status = result.get("status", "UNCERTAIN")
     reasoning  = result.get("reasoning", "")
     evidence   = result.get("ngo_evidence", ngo_evidence)
 
+    # Force FAIL if consistency issues exist for this dimension
+    is_consistency_failure = False
+    if consistency_issues:
+        llm_status = "FAIL"
+        reasoning = "[Consistency issue] " + "; ".join(consistency_issues) + ". " + reasoning
+        is_consistency_failure = True
+
     # 7. Validate citation — fast path checks the chunk we actually fed to the model
     citation       = result.get("legal_citation", "")
     citation_valid = validate_citation(citation, canonical_state, chunk_meta=top_meta)
 
-    # 8. Downgrade if citation cannot be verified
-    if not citation_valid and llm_status in ("PASS", "FAIL"):
+    # 8. Downgrade if citation cannot be verified (except for consistency failures)
+    if not is_consistency_failure and not citation_valid and llm_status in ("PASS", "FAIL"):
         llm_status = "UNCERTAIN"
         reasoning  = "[Citation unverified] " + reasoning
 
@@ -536,26 +674,30 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     #    PASS/FAIL with verified citation -> high confidence.
     #    UNCERTAIN (missing evidence) -> low confidence.
     #    UNCERTAIN (parse error/fallback) -> very low confidence.
-    if llm_status in ("PASS", "FAIL") and citation_valid:
+    if is_consistency_failure:
+        confidence = 0.30   # critical failure, < 50% so it auto-fails in report
+    elif llm_status in ("PASS", "FAIL") and citation_valid:
         confidence = 0.90
     elif llm_status == "CORPUS_GAP":
         confidence = 0.00
-    elif "could not be parsed" in reasoning:
+    elif "could not be parsed" in reasoning or not result:
         confidence = 0.10   # JSON parse failure
     elif ngo_evidence == "No relevant fields extracted.":
         confidence = 0.30   # evidence genuinely absent
     else:
         confidence = 0.50   # ambiguous / citation not verified
 
-    # 10. Deterministic routing — based on system state, not confidence score.
-    #     PASS or FAIL with a verified citation goes directly to report.
-    #     Everything else goes to human review.
+    # 10. Deterministic routing based on Priority 3 rules
     if llm_status == "CORPUS_GAP":
         routing = "corpus_alert"
-    elif llm_status in ("PASS", "FAIL") and citation_valid:
+    elif confidence >= 0.85:
         routing = "auto_report"
-    else:
+    elif 0.50 <= confidence < 0.85:
         routing = "human_review"
+        llm_status = "UNCERTAIN"
+    else: # confidence < 0.50
+        routing = "auto_report"
+        llm_status = "FAIL"
 
     return Finding(
         dimension_id=dimension["id"],
@@ -571,14 +713,14 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     )
 
 
-def run_full_assessment(ngo_json: dict, state: str, entity_type: str) -> list:
+def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_org_name: str) -> list:
     """
     Run all 7 dimensions. Returns list of Finding objects.
-    Cross-document consistency is checked once upfront.
-    Each dimension receives only the consistency issues relevant to it.
+    Cross-document consistency is checked once upfront against submitted_org_name.
+    Evaluates all compliance categories simultaneously in a single LLM request.
     """
     # Run cross-document consistency check once for all dimensions
-    all_consistency = check_consistency(ngo_json)
+    all_consistency = check_consistency(ngo_json, submitted_org_name)
     total_issues = sum(len(v) for v in all_consistency.values())
     if total_issues:
         print(f"[RAG] Consistency issues detected ({total_issues} total):")
@@ -588,16 +730,97 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str) -> list:
     else:
         print("[RAG] No cross-document consistency issues detected.")
 
+    STATE_MAP = {
+        "dl": "delhi",
+        "mh": "maharashtra",
+        "ka": "karnataka",
+        "rj": "rajasthan"
+    }
+    canonical_state = STATE_MAP.get(state.lower(), state.lower())
+
+    # 1. Gather active dimensions and retrieve context
+    active_dimensions = {}
+    gap_findings = {}
+
+    for dim in DIMENSIONS:
+        query = dim["query"].format(state=canonical_state, entity_type=entity_type)
+        chunks, metas = retrieve_legal_context(query, canonical_state)
+        
+        if not chunks:
+            gap_findings[dim["id"]] = Finding(
+                dimension_id=dim["id"],
+                dimension_name=dim["name"],
+                status="CORPUS_GAP",
+                confidence=0.0,
+                legal_citation="",
+                ngo_evidence="",
+                reasoning=f"No legal provisions found for {dim['id']} in {canonical_state}. Add the relevant Act to the corpus.",
+                routing="corpus_alert",
+                citation_valid=False,
+            )
+        else:
+            top_chunk = chunks[0]
+            top_meta = metas[0] if metas else {}
+            ngo_evidence = extract_evidence(ngo_json, dim["evidence_fields"])
+            dim_issues = _filter_consistency_issues(all_consistency, dim)
+            active_dimensions[dim["id"]] = {
+                "dimension": dim,
+                "top_chunk": top_chunk,
+                "top_meta": top_meta,
+                "ngo_evidence": ngo_evidence,
+                "dim_issues": dim_issues,
+            }
+
+    # 2. Call LLM for all active dimensions in a single request
+    combined_raw_output = None
+    parsed_results = {}
+
+    if active_dimensions:
+        prompt = build_combined_prompt(active_dimensions, canonical_state, entity_type)
+        print(f"[RAG] Calling Gemini for all active dimensions (prompt={len(prompt)} chars)...")
+        try:
+            combined_raw_output = generate(
+                prompt,
+                system=None,
+                expect_json=True
+            )
+            print(f"[RAG] Gemini responded — {len(combined_raw_output)} chars")
+            parsed_results = safe_parse_json(combined_raw_output)
+        except Exception as e:
+            print(f"[RAG] ERROR during combined Gemini call: {e}")
+
+    # 3. Construct Findings
     findings = []
     for dim in DIMENSIONS:
+        dim_id = dim["id"]
         print(f"  Assessing: {dim['name']}...")
-        # Filter to only issues relevant to this dimension
-        dim_issues = _filter_consistency_issues(all_consistency, dim)
-        finding = assess_dimension(dim, ngo_json, state, entity_type,
-                                   consistency_issues=dim_issues or None)
+        if dim_id in gap_findings:
+            finding = gap_findings[dim_id]
+        else:
+            dim_data = active_dimensions[dim_id]
+            
+            dim_result = {}
+            if isinstance(parsed_results, dict) and dim_id in parsed_results:
+                dim_result = parsed_results[dim_id]
+            else:
+                dim_result = {
+                    "status": "UNCERTAIN",
+                    "reasoning": "Combined LLM response could not be parsed for this dimension."
+                }
+            
+            finding = assess_dimension(
+                dimension=dim,
+                ngo_json=ngo_json,
+                state=canonical_state,
+                entity_type=entity_type,
+                consistency_issues=dim_data["dim_issues"] or None,
+                precomputed_result=dim_result,
+                raw_llm_output=combined_raw_output,
+                top_chunk=dim_data["top_chunk"],
+                top_meta=dim_data["top_meta"]
+            )
         findings.append(finding)
-        print(f"  -> {finding.status} ({round(finding.confidence*100)}% conf) "
-              f"[{finding.routing}]")
+        print(f"  -> {finding.status} ({round(finding.confidence*100)}% conf) [{finding.routing}]")
     return findings
 
 

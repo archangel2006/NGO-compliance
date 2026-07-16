@@ -8,7 +8,8 @@ DOCUMENT_TEMPLATES = {
     "trust_deed": {
         "description": "Trust Deed or Declaration of Trust",
         "fields": {
-            "org_name":           r"(?:known as|name of trust|trust(?:ed)? as)[:\s]+([A-Z][^\n]{5,80})",
+            # Matches label + colon/space + a title-cased name that is NOT the label word itself
+            "org_name":           r"(?:name\s+of\s+(?:the\s+)?trust|known\s+as|trust(?:ed)?\s+as)[:\s]+(?!name|of|the)([A-Z][A-Za-z\s&]{4,80}(?:Trust|Society|Foundation|Samiti|Sangh|Welfare|Seva|NGO))",
             "reg_date":           r"(?:executed on|this deed dated|dated this)[:\s]+(\d{1,2}[\s\/\-]\w+[\s\/\-]\d{4})",
             "non_profit_clause":  r"(no(?:t for)? profit|charitable purpose|non.profit)[^\n]{0,200}",
             "objectives_clause":  r"(?:objects?|objectives?|purposes?)[:\s]+([^\n]{50,})",
@@ -42,7 +43,10 @@ DOCUMENT_TEMPLATES = {
             "form_ref":         r"(?:Form\s*No\.?|application\s*in\s*Form)[:\s]+(10A|10AB)",
             "provisional_flag": r"(provisional|final|permanent)\s*(?:registration|approval)",
         },
-        "ner_fields": ["org_name"],
+        # org_name is intentionally NOT extracted from 12A/80G —
+        # the issuing authority (Income Tax Department) dominates NER;
+        # org name should come from trust_deed or pan_card instead.
+        "ner_fields": [],
         "dimensions": ["tax"],
     },
 
@@ -67,7 +71,9 @@ DOCUMENT_TEMPLATES = {
             "bank_name":        r"(?:bank\s*name|name\s*of\s*bank)[:\s]+([^\n]{5,50})",
             "bank_branch":      r"(?:branch|branch\s*name)[:\s]+([^\n]{5,60})",
         },
-        "ner_fields": ["org_name"],
+        # org_name from FCRA cert is NOT in ner_fields — issuing authority text
+        # dominates NER here; org name should come from trust_deed or pan_card
+        "ner_fields": [],
         "dimensions": ["fcra"],
     },
 

@@ -203,7 +203,19 @@ export default function DashboardPage({ go }) {
                 <div style={{ marginTop: 9, fontSize: 11, color: THEME.MT, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{finding.reasoning}</div>
                 {finding.status === "FAIL" && <div style={{ marginTop: 8, background: "#FEE2E2", border: "1px solid #FCA5A5", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.RD }}>⚠ Action Required: Critical compliance gap found.</div>}
                 {finding.route === "human" && finding.qStatus === "pending" && <div style={{ marginTop: 8, background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.AM }}>⟳ Pending review · Assigned to officer</div>}
-                {finding.route === "human" && finding.qStatus === "reviewed" && <div style={{ marginTop: 8, background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 5, padding: "6px 9px", fontSize: 11, color: THEME.GR }}>✓ Reviewed → {finding.determination}</div>}
+                {finding.route === "human" && finding.qStatus === "reviewed" && (
+                  <div style={{
+                    marginTop: 8,
+                    background: finding.determination === "PASS" ? "#ECFDF5" : "#FEE2E2",
+                    border: `1px solid ${finding.determination === "PASS" ? "#A7F3D0" : "#FCA5A5"}`,
+                    borderRadius: 5,
+                    padding: "6px 9px",
+                    fontSize: 11,
+                    color: finding.determination === "PASS" ? THEME.GR : THEME.RD
+                  }}>
+                    {finding.determination === "PASS" ? "✓" : "✗"} Reviewed → {finding.determination}
+                  </div>
+                )}
               </Card>
             );
           })}
