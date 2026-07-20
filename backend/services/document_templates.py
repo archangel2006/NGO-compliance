@@ -8,8 +8,8 @@ DOCUMENT_TEMPLATES = {
     "trust_deed": {
         "description": "Trust Deed or Declaration of Trust",
         "fields": {
-            # Matches label + colon/space + a title-cased name that is NOT the label word itself
-            "org_name":           r"(?:name\s+of\s+(?:the\s+)?trust|known\s+as|trust(?:ed)?\s+as)[:\s]+(?!name|of|the)([A-Z][A-Za-z\s&]{4,80}(?:Trust|Society|Foundation|Samiti|Sangh|Welfare|Seva|NGO))",
+            # Matches label + colon/space + a title-cased name that is NOT the label word itself, allows "The" prefixed names
+            "org_name":           r"(?:name\s+of\s+(?:the\s+)?trust|known\s+as|trust(?:ed)?\s+as)[:\s]+(?!(?:name|of|the\s+trust)\b)([A-Z][A-Za-z\s&]{4,80}(?:Trust|Society|Foundation|Samiti|Sangh|Welfare|Seva|NGO))",
             "reg_date":           r"(?:executed on|this deed dated|dated this)[:\s]+(\d{1,2}[\s\/\-]\w+[\s\/\-]\d{4})",
             "non_profit_clause":  r"(no(?:t for)? profit|charitable purpose|non.profit)[^\n]{0,200}",
             "objectives_clause":  r"(?:objects?|objectives?|purposes?)[:\s]+([^\n]{50,})",
@@ -104,7 +104,8 @@ DOCUMENT_TEMPLATES = {
         "description": "PAN Card of the Organisation",
         "fields": {
             "pan":         r"\b([A-Z]{5}\d{4}[A-Z])\b",
-            "org_name_pan": r"\n([A-Z\s]{5,60}(?:TRUST|SOCIETY|FOUNDATION|SAMITI|SANGH|WELFARE|SEVA))",
+            # Exclude lines starting with metadata label terms like Name, Holder, Status, Date
+            "org_name_pan": r"\n(?!.*(?:name|organisation|holder|status|date|permanent|account|number|card|father|issued))\s*([A-Z\s]{5,60}(?:TRUST|SOCIETY|FOUNDATION|SAMITI|SANGH|WELFARE|SEVA))",
         },
         "ner_fields": [],
         "dimensions": ["tax", "fcra"],

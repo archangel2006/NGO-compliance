@@ -158,12 +158,21 @@ def _normalize(fields: dict) -> dict:
     for k, v in fields.items():
         if isinstance(v, str):
             v = v.strip().strip(".,;: ")
-            if "pan" in k.lower():
-                v = v.upper()
-            if "date" in k.lower() or "until" in k.lower() or "from" in k.lower():
-                v = _normalize_date(v)
-            if any(w in k for w in ["receipts", "expenditure", "total", "balance"]):
-                v = v.replace(",", "")
+            # Reject values that are only labels
+            v_upper = v.upper()
+            if v_upper in {
+                "NAME OF TRUST", "TRUST NAME", "ORGANISATION NAME",
+                "ORGANIZATION NAME", "NAME", "NAME OF THE TRUST",
+                "NAME OF SOCIETY", "NAME OF HOLDER"
+            }:
+                v = None
+            else:
+                if "pan" in k.lower():
+                    v = v.upper()
+                if "date" in k.lower() or "until" in k.lower() or "from" in k.lower():
+                    v = _normalize_date(v)
+                if any(w in k for w in ["receipts", "expenditure", "total", "balance"]):
+                    v = v.replace(",", "")
         out[k] = v
     return out
 

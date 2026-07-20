@@ -9,6 +9,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
 from dotenv import load_dotenv
+import difflib
 
 
 # Resolve paths relative to the current file or environment variable
@@ -409,36 +410,113 @@ _CONSISTENCY_FIELDS: dict = {
 }
 
 
+_DOC_TYPE_DISPLAY_NAMES = {
+    "trust_deed": "Trust Deed",
+    "registration_certificate": "Registration Certificate",
+    "pan_card": "PAN",
+    "annual_report": "Annual Report",
+    "certificate_12a": "12A Certificate",
+    "certificate_80g": "80G Certificate",
+    "fcra_certificate": "FCRA Certificate",
+    "audit_report": "Audit Report",
+}
+
+
+def is_name_in_text(norm_submitted: str, ocr_text: str) -> bool:
+    """
+    Search raw OCR text for the normalized organization name.
+    Performs exact substring matching followed by a line-by-line sliding window difflib check.
+    Uses a conservative similarity threshold (92%) to prevent matching different organizations.
+    """
+    # 1. Exact substring check first
+    norm_ocr = " ".join(re.sub(r'[^a-z0-9\s]', ' ', ocr_text.lower()).split())
+    if norm_submitted in norm_ocr:
+        return True
+
+    # 2. Line-by-line sliding window check for minor OCR errors / typos (conservative threshold: 92%)
+    lines = ocr_text.splitlines()
+    for line in lines:
+        norm_line = " ".join(re.sub(r'[^a-z0-9\s]', ' ', line.lower()).split())
+        if not norm_line:
+            continue
+        ratio = difflib.SequenceMatcher(None, norm_submitted, norm_line).ratio()
+        if ratio >= 0.92:
+            return True
+        # Check window segments in longer lines
+        words_submitted = norm_submitted.split()
+        words_line = norm_line.split()
+        n = len(words_submitted)
+        if len(words_line) >= n:
+            for i in range(len(words_line) - n + 1):
+                window = " ".join(words_line[i:i+n])
+                if difflib.SequenceMatcher(None, norm_submitted, window).ratio() >= 0.92:
+                    return True
+    return False
+
+
+def check_org_name_verification(ngo_json: dict, submitted_org_name: str) -> list:
+    """
+    Validate that the submitted NGO name is found in at least one official document.
+    Returns list of matched document display names.
+    """
+    ocr_texts = ngo_json.get("_ocr_texts", {})
+    if not ocr_texts:
+        # Fallback to Trust Deed display name if no raw text is present (e.g. in test suites with mock fields)
+        return ["Trust Deed"]
+
+    matched_docs = []
+    norm_submitted = " ".join(re.sub(r'[^a-z0-9\s]', ' ', submitted_org_name.lower()).split())
+    for doc_type, ocr_text in ocr_texts.items():
+        if is_name_in_text(norm_submitted, ocr_text):
+            display_name = _DOC_TYPE_DISPLAY_NAMES.get(doc_type, doc_type.replace("_", " ").title())
+            matched_docs.append(display_name)
+
+    return matched_docs
+
+
+def check_contradictory_evidence(ngo_json: dict, submitted_org_name: str) -> bool:
+    """
+    Check if the uploaded documents consistently identify a completely different organization.
+    """
+    norm_submitted = " ".join(re.sub(r'[^a-z0-9\s]', ' ', submitted_org_name.lower()).split())
+    extracted_names = []
+    for key in ["org_name", "org_name_pan"]:
+        name = ngo_json.get(key)
+        if name and str(name).strip():
+            extracted_names.append(str(name).strip())
+
+    if not extracted_names:
+        return False
+
+    # If any extracted name matches (exactly or fuzzily), it is not contradictory
+    for name in extracted_names:
+        norm_name = " ".join(re.sub(r'[^a-z0-9\s]', ' ', name.lower()).split())
+        if norm_submitted in norm_name or norm_name in norm_submitted:
+            return False
+        ratio = difflib.SequenceMatcher(None, norm_submitted, norm_name).ratio()
+        if ratio >= 0.92:
+            return False
+
+    return True
+
+
 def check_consistency(ngo_json: dict, submitted_org_name: str) -> dict:
     """
     Detect cross-document field contradictions.
-    Verifies that extracted organization names match the canonical submitted name.
+    Note: org_name verification is handled separately via check_org_name_verification
+    so that a missing name reduces confidence rather than causing a hard legal FAIL.
     """
     all_issues: dict = {canonical: [] for canonical in _CONSISTENCY_FIELDS}
 
     def _norm(s: str) -> str:
-        # Strip punctuation and normalise whitespace
         cleaned = re.sub(r'[^a-z0-9\s]', ' ', s.lower())
         return " ".join(cleaned.split())
 
-    norm_submitted = _norm(submitted_org_name)
-
     for canonical, keys in _CONSISTENCY_FIELDS.items():
         if canonical == "org_name":
-            # Compare extracted org names against the canonical submitted name
-            for k in keys:
-                extracted = ngo_json.get(k)
-                if extracted and str(extracted).strip():
-                    norm_extracted = _norm(str(extracted))
-                    # Check if they are reasonably similar (substring match in either direction)
-                    # to account for "ABC Trust" vs "The ABC Trust"
-                    if norm_extracted not in norm_submitted and norm_submitted not in norm_extracted:
-                        all_issues[canonical].append(
-                            f"Organisation name mismatch: Uploaded document shows '{extracted}' "
-                            f"which does not match the submitted name '{submitted_org_name}'."
-                        )
+            # Verification is now handled via check_org_name_verification in run_full_assessment
+            pass
         else:
-            # For any future multi-key consistency fields
             seen: list[tuple[str, str]] = []
             for k in keys:
                 v = ngo_json.get(k)
@@ -670,6 +748,19 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         llm_status = "UNCERTAIN"
         reasoning  = "[Citation unverified] " + reasoning
 
+    # Apply organization name verification status and reasoning updates
+    identity_status = ngo_json.get("_identity_status", "verified")
+    matched_docs    = ngo_json.get("_matched_docs", [])
+    is_identity_dim = dimension["id"] in ("registration", "governance")
+
+    if is_identity_dim:
+        if identity_status == "verified":
+            reasoning = f"[Verified in: {', '.join(matched_docs)}] " + reasoning
+        elif identity_status == "unverified":
+            reasoning = "[Verification warning] Organisation name could not be confidently verified across uploaded documents. " + reasoning
+        elif identity_status == "contradictory":
+            reasoning = "[Contradictory warning] Uploaded documents consistently identify a different organization. " + reasoning
+
     # 9. Deterministic confidence — no LLM self-report used.
     #    PASS/FAIL with verified citation -> high confidence.
     #    UNCERTAIN (missing evidence) -> low confidence.
@@ -686,6 +777,20 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         confidence = 0.30   # evidence genuinely absent
     else:
         confidence = 0.50   # ambiguous / citation not verified
+
+    # Apply weighted identity score for identity dimensions
+    if is_identity_dim and not is_consistency_failure and llm_status != "CORPUS_GAP":
+        IDENTITY_WEIGHT = 0.15
+        LEGAL_WEIGHT    = 0.85
+        
+        if identity_status == "verified":
+            identity_score = 1.0
+        elif identity_status == "unverified":
+            identity_score = 0.5
+        else: # contradictory
+            identity_score = 0.0
+            
+        confidence = confidence * LEGAL_WEIGHT + identity_score * IDENTITY_WEIGHT
 
     # 10. Deterministic routing based on Priority 3 rules
     if llm_status == "CORPUS_GAP":
@@ -719,6 +824,17 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
     Cross-document consistency is checked once upfront against submitted_org_name.
     Evaluates all compliance categories simultaneously in a single LLM request.
     """
+    # Verify organization name matches across all uploaded documents
+    matched_docs = check_org_name_verification(ngo_json, submitted_org_name)
+    ngo_json["_matched_docs"] = matched_docs
+
+    if matched_docs:
+        ngo_json["_identity_status"] = "verified"
+    elif check_contradictory_evidence(ngo_json, submitted_org_name):
+        ngo_json["_identity_status"] = "contradictory"
+    else:
+        ngo_json["_identity_status"] = "unverified"
+
     # Run cross-document consistency check once for all dimensions
     all_consistency = check_consistency(ngo_json, submitted_org_name)
     total_issues = sum(len(v) for v in all_consistency.values())

@@ -65,6 +65,7 @@ def _run_assessment(submission_id: str):
         # ── STEP 2: Structured extraction ──────────────────────────
         SUBMISSIONS[submission_id]["progress_step"] = 4
         merged = extract_all(doc_inputs)
+        merged["_ocr_texts"] = {doc["doc_type"]: doc["text"] for doc in doc_inputs}
         EXTRACTED[submission_id] = {
             "submission_id":   submission_id,
             "merged_fields":   merged,
