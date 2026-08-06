@@ -944,6 +944,17 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
             print(f"  Support 1: {support1_meta.get('act_name')} | {support1_meta.get('section_ref')}")
             print(f"  Support 2: {support2_meta.get('act_name')} | {support2_meta.get('section_ref')}")
 
+            # Debug logging for legal retrieval
+            print(f"\n=================== DEBUG RETRIEVAL: {dim['id']} ===================")
+            print(f"Dimension ID: {dim['id']}")
+            print(f"Primary Metadata: state={primary_meta.get('state')}, act_name={primary_meta.get('act_name')}, section_ref={primary_meta.get('section_ref')}, source={primary_meta.get('source')}")
+            print(f"Primary Chunk Text:\n{primary_chunk}")
+            print(f"Supporting 1 Metadata: state={support1_meta.get('state')}, act_name={support1_meta.get('act_name')}, section_ref={support1_meta.get('section_ref')}, source={support1_meta.get('source')}")
+            print(f"Supporting 1 Chunk Text:\n{supporting_chunk_1}")
+            print(f"Supporting 2 Metadata: state={support2_meta.get('state')}, act_name={support2_meta.get('act_name')}, section_ref={support2_meta.get('section_ref')}, source={support2_meta.get('source')}")
+            print(f"Supporting 2 Chunk Text:\n{supporting_chunk_2}")
+            print(f"=====================================================================\n")
+
             active_dimensions[dim["id"]] = {
                 "dimension":          dim,
                 "primary_chunk":      primary_chunk,
