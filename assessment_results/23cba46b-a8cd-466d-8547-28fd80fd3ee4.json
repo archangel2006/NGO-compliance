@@ -1,0 +1,177 @@
+{
+  "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+  "findings": [
+    {
+      "id": "34b9aa0a-c1ac-4ad8-b7f8-fd3af8d84717",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "UNCERTAIN",
+      "confidence": 0.575,
+      "legal_citation": "Public Trust Acts of States",
+      "ngo_evidence": "act_registered_under: the Registration Act, 1908",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.027034"
+    },
+    {
+      "id": "abd6e747-88f9-4b98-ac09-06570a1d1fc0",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "UNCERTAIN",
+      "confidence": 0.575,
+      "legal_citation": "Section 16 of the Societies Registration Act, 1860",
+      "ngo_evidence": "quorum: The",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.027034"
+    },
+    {
+      "id": "25f10796-4800-4722-aca3-9ed16947d926",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Section 3A of the Societies Registration Act, 1860",
+      "ngo_evidence": "trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\nSection 5']",
+      "reasoning": "The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.027034"
+    },
+    {
+      "id": "efdf8c91-1627-4704-a666-6c9fb83605a9",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "PASS",
+      "confidence": 0.9,
+      "legal_citation": "Section 80G of the Income Tax Act, 1961",
+      "ngo_evidence": "total_receipts: 3477000, total_expenditure: 1995000",
+      "reasoning": "The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.",
+      "routing": "auto_report",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.027034"
+    },
+    {
+      "id": "65ab0db7-b3ef-4b92-80f0-ebf5996d5500",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "PASS",
+      "confidence": 0.9,
+      "legal_citation": "Chapter XII-EB of the Income Tax Act, 1961",
+      "ngo_evidence": "cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127",
+      "reasoning": "The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.",
+      "routing": "auto_report",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.027034"
+    },
+    {
+      "id": "7ffedf5f-932f-4d8b-ae93-180657439f4a",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Foreign Contribution Regulation Act",
+      "ngo_evidence": "fcra_reg_number: 231560442",
+      "reasoning": "[Citation unverified] The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.029039"
+    },
+    {
+      "id": "e26fd439-4e3f-4d65-9cdb-a28dd9ee1230",
+      "submission_id": "23cba46b-a8cd-466d-8547-28fd80fd3ee4",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Section 12(1A) of the Foreign Contribution Regulation Act",
+      "ngo_evidence": "auditor_icai: 026871, audit_period: 31 March 2024",
+      "reasoning": "[Citation unverified] The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Public Trust Acts of States\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The entity is a Public Trust, but the evidence cites the Registration Act, 1908 (typically for property/documents) rather than the specific State Public Trust Act required for trust registration.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: The\",\n    \"reasoning\": \"The evidence provided for the quorum is incomplete ('The'), making it impossible to verify if the governing body's management structure meets legal standards.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3A of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\\\nSection 5']\",\n    \"reasoning\": \"The evidence contains duplicate entries and ambiguous data ('Vasant Vihar' appears as a trustee name), preventing a clear assessment of the governing body's composition.\"\n  },\n  \"financial\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The entity has provided financial figures for the 2023-24 period, demonstrating the maintenance of books of accounts as required.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127\",\n    \"reasoning\": \"The entity holds valid 12AB and 80G registrations, which are the standard tax compliance requirements for trusts.\"\n  },\n  \"fcra\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The entity possesses a valid FCRA registration number, indicating compliance with foreign funding regulations.\"\n  },\n  \"audit\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution Regulation Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The entity has provided a valid ICAI auditor registration number and a defined audit period, satisfying the requirement for financial oversight.\"\n  }\n}",
+      "created_at": "2026-07-24T15:40:39.029039"
+    }
+  ],
+  "score": {
+    "overall_score": 66,
+    "label": "Partial Compliance \u2014 Significant Gaps",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "UNCERTAIN",
+        "confidence": 0.57,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "UNCERTAIN",
+        "confidence": 0.57,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "PASS",
+        "confidence": 0.9,
+        "adjusted_score": 0.95,
+        "weight": 0.2,
+        "contribution": 0.19
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "PASS",
+        "confidence": 0.9,
+        "adjusted_score": 0.95,
+        "weight": 0.15,
+        "contribution": 0.142
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      }
+    },
+    "pass_count": 2,
+    "fail_count": 0,
+    "uncertain_count": 5,
+    "corpus_gap_count": 0
+  }
+}

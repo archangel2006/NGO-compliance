@@ -13,7 +13,7 @@ DOCUMENT_TEMPLATES = {
             "reg_date":           r"(?:executed on|this deed dated|dated this)[:\s]+(\d{1,2}[\s\/\-]\w+[\s\/\-]\d{4})",
             "non_profit_clause":  r"(no(?:t for)? profit|charitable purpose|non.profit)[^\n]{0,200}",
             "objectives_clause":  r"(?:objects?|objectives?|purposes?)[:\s]+([^\n]{50,})",
-            "quorum":             r"quorum[:\s]+(\w+|\d+)",
+            "quorum":             r"quorum[:\s]+([\w][^\n.;]{0,60})",
             "amendment_clause":   r"(?:amendment|alteration)[^\n]{0,150}",
         },
         "ner_fields":   ["trustee_names", "org_address", "office_bearers"],
