@@ -228,16 +228,17 @@ DIMENSIONS = [
 
 @dataclass
 class Finding:
-    dimension_id:     str
-    dimension_name:   str
-    status:           str   # PASS | FAIL | UNCERTAIN | CORPUS_GAP
-    confidence:       float
-    legal_citation:   str
-    ngo_evidence:     str
-    reasoning:        str
-    routing:          str   # auto_report | human_review | corpus_alert
-    citation_valid:   bool = True
-    raw_llm_output:   Optional[str] = None
+    dimension_id:       str
+    dimension_name:     str
+    status:             str   # PASS | FAIL | UNCERTAIN | CORPUS_GAP
+    confidence:         float
+    legal_citation:     str
+    ngo_evidence:       str
+    reasoning:          str
+    routing:            str   # auto_report | human_review | corpus_alert
+    citation_valid:     bool = True
+    raw_llm_output:     Optional[str] = None
+    matched_requirement: str = ""  # Specific legal requirement identified by LLM
 
 
 def retrieve_legal_context(query: str, state: str, n_results: int = 5) -> tuple:
@@ -853,6 +854,8 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         routing = "auto_report"
         llm_status = "FAIL"
 
+    matched_requirement = result.get("matched_requirement", "") if isinstance(result, dict) else ""
+
     return Finding(
         dimension_id=dimension["id"],
         dimension_name=dimension["name"],
@@ -864,6 +867,7 @@ def assess_dimension(dimension: dict, ngo_json: dict,
         routing=routing,
         citation_valid=citation_valid,
         raw_llm_output=raw,
+        matched_requirement=matched_requirement,
     )
 
 
@@ -927,18 +931,27 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
             # Use top 3 chunks; rename for clarity
             primary_chunk      = chunks[0]
             primary_meta       = metas[0] if metas else {}
+            support1_meta      = metas[1] if len(metas) > 1 else {}
+            support2_meta      = metas[2] if len(metas) > 2 else {}
             supporting_chunk_1 = chunks[1] if len(chunks) > 1 else ""
             supporting_chunk_2 = chunks[2] if len(chunks) > 2 else ""
             ngo_evidence       = extract_evidence(ngo_json, dim["evidence_fields"])
             dim_issues         = _filter_consistency_issues(all_consistency, dim)
+
+            # Retrieval audit log — shows which legal chunks were selected per dimension
+            print(f"[RAG] {dim['id']} retrieval:")
+            print(f"  Primary  : {primary_meta.get('act_name')} | {primary_meta.get('section_ref')}")
+            print(f"  Support 1: {support1_meta.get('act_name')} | {support1_meta.get('section_ref')}")
+            print(f"  Support 2: {support2_meta.get('act_name')} | {support2_meta.get('section_ref')}")
+
             active_dimensions[dim["id"]] = {
-                "dimension":         dim,
-                "primary_chunk":     primary_chunk,
-                "primary_meta":      primary_meta,
+                "dimension":          dim,
+                "primary_chunk":      primary_chunk,
+                "primary_meta":       primary_meta,
                 "supporting_chunk_1": supporting_chunk_1,
                 "supporting_chunk_2": supporting_chunk_2,
-                "ngo_evidence":      ngo_evidence,
-                "dim_issues":        dim_issues,
+                "ngo_evidence":       ngo_evidence,
+                "dim_issues":         dim_issues,
             }
 
     # 2. Call LLM for all active dimensions in a single request
