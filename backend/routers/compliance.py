@@ -9,7 +9,7 @@ from backend.store import (
     get_submission, get_documents_for_submission, get_findings_for_submission,
 )
 from backend.services.ocr import extract_text
-from backend.services.extraction import extract_all
+from backend.services.extraction import extract_all, save_document_facts
 from backend.services.rag import run_full_assessment
 from backend.services.scoring import calculate_score
 
@@ -72,6 +72,9 @@ def _run_assessment(submission_id: str):
             "extraction_log":  merged.pop("_log", []),
             "created_at":      now(),
         }
+
+        # Save live document facts to all 8 document-specific SQL tables
+        save_document_facts(submission_id, merged)
 
         # ── STEP 3: RAG + LLM per dimension ────────────────────────
         SUBMISSIONS[submission_id]["progress_step"] = 5
