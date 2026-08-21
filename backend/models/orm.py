@@ -1,10 +1,11 @@
-from sqlalchemy import Column, String, Integer, Boolean, Float, ForeignKey, JSON
+from sqlalchemy import Column, String, Integer, Boolean, Float, ForeignKey
 from backend.models.database import Base
 
 
-# ── Core Tables ───────────────────────────────────────────────────
+# ── Core Relational Tables ────────────────────────────────────────
 
 class Submission(Base):
+    """NGO Submission record with flat relational compliance score columns."""
     __tablename__ = "submissions"
     id = Column(String, primary_key=True)
     org_name = Column(String, nullable=False)
@@ -18,13 +19,23 @@ class Submission(Base):
     status = Column(String, default="pending")
     submitted_by = Column(String, nullable=True)
     progress_step = Column(Integer, default=0)
-    score = Column(JSON, nullable=True)
+    
+    # Flat Relational Score Columns
+    overall_score = Column(Float, nullable=True)
+    score_label = Column(String, nullable=True)
+    grant_ready = Column(Boolean, nullable=True)
+    pass_count = Column(Integer, default=0)
+    fail_count = Column(Integer, default=0)
+    uncertain_count = Column(Integer, default=0)
+    corpus_gap_count = Column(Integer, default=0)
+
     error = Column(String, nullable=True)
     created_at = Column(String)
     updated_at = Column(String)
 
 
 class UploadedDocument(Base):
+    """File upload registry table."""
     __tablename__ = "uploaded_documents"
     id = Column(String, primary_key=True)
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"))
@@ -39,15 +50,16 @@ class UploadedDocument(Base):
 
 
 class ExtractedFields(Base):
-    """Merged flat JSON of all extracted fields — used by RAG pipeline."""
+    """Extraction metadata table."""
     __tablename__ = "extracted_fields"
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"), primary_key=True)
-    merged_fields = Column(JSON)
-    extraction_log = Column(JSON)
+    total_fields_extracted = Column(Integer, default=0)
+    extraction_status = Column(String)
     created_at = Column(String)
 
 
 class ComplianceFinding(Base):
+    """Compliance assessment finding table per dimension."""
     __tablename__ = "compliance_findings"
     id = Column(String, primary_key=True)
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"))
@@ -69,6 +81,7 @@ class ComplianceFinding(Base):
 
 
 class HumanReviewQueue(Base):
+    """Human review officer queue table."""
     __tablename__ = "human_review_queue"
     id = Column(String, primary_key=True)
     finding_id = Column(String, ForeignKey("compliance_findings.id", ondelete="CASCADE"))
@@ -84,10 +97,10 @@ class HumanReviewQueue(Base):
     created_at = Column(String)
 
 
-# ── Document-Specific Extraction Tables (1 row per submission) ────
+# ── Document-Specific Extraction Fact Tables (Flat Relational Columns) ────
 
 class ExtractedTrustDeed(Base):
-    """Extracted fields from Trust Deed / Memorandum of Association."""
+    """Extracted fields from Trust Deed / MOA."""
     __tablename__ = "extracted_trust_deeds"
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"), primary_key=True)
     org_name = Column(String)
@@ -97,8 +110,8 @@ class ExtractedTrustDeed(Base):
     amendment_clause = Column(String)
     org_address = Column(String)
     trustee_count = Column(Integer)
-    trustee_names = Column(JSON)
-    office_bearers = Column(JSON)
+    trustee_names = Column(String)       # Comma-separated text list
+    office_bearers = Column(String)      # Comma-separated text list
     non_profit_clause_present = Column(Boolean)
     dissolution_clause_present = Column(Boolean)
 
@@ -149,7 +162,7 @@ class ExtractedFCRACertificate(Base):
 
 
 class ExtractedAnnualReport(Base):
-    """Extracted fields from Annual Report / Fund Utilisation Statement."""
+    """Extracted fields from Annual Report."""
     __tablename__ = "extracted_annual_reports"
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"), primary_key=True)
     financial_year = Column(String)
@@ -158,11 +171,11 @@ class ExtractedAnnualReport(Base):
     csr_grant_present = Column(Boolean, default=False)
     govt_grant_present = Column(Boolean, default=False)
     fund_utilisation_present = Column(Boolean, default=False)
-    grant_sources = Column(JSON)
+    grant_sources = Column(String)      # Comma-separated text list
 
 
 class ExtractedAuditReport(Base):
-    """Extracted fields from Chartered Accountant Audit Report."""
+    """Extracted fields from CA Audit Report."""
     __tablename__ = "extracted_audit_reports"
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"), primary_key=True)
     auditor_name = Column(String)

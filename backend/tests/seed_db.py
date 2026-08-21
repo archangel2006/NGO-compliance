@@ -1,5 +1,5 @@
 """
-Seed script — populates all 13 database tables with realistic NGO sample data.
+Seed script — populates all 13 database tables with 100% flat scalar relational columns.
 Run from project root:
     python -m backend.tests.seed_db
 """
@@ -47,15 +47,13 @@ NGOS = [
             "status": "complete",
             "submitted_by": "officer@darpan.gov.in",
             "progress_step": 8,
-            "score": {
-                "overall_score": 84.5,
-                "label": "Mostly Compliant - Minor Gaps",
-                "grant_ready": False,
-                "pass_count": 4,
-                "fail_count": 1,
-                "uncertain_count": 2,
-                "corpus_gap_count": 0,
-            },
+            "overall_score": 84.5,
+            "score_label": "Mostly Compliant - Minor Gaps",
+            "grant_ready": False,
+            "pass_count": 4,
+            "fail_count": 1,
+            "uncertain_count": 2,
+            "corpus_gap_count": 0,
         },
         "documents": [
             {"doc_type": "trust_deed",                 "file_name": "asha_trust_deed.pdf",          "file_size": 524288,  "ocr_method": "pymupdf",    "ocr_quality": "good"},
@@ -75,8 +73,8 @@ NGOS = [
             "amendment_clause": "Amendments require two-thirds majority of trustees",
             "org_address": "Plot 24, Sector 12, Dwarka, New Delhi - 110075",
             "trustee_count": 7,
-            "trustee_names": ["Ramesh Kumar Sharma", "Sunita Devi Gupta", "Anil Kumar Verma", "Priya Malhotra", "Dr. Suresh Nair", "Meena Agarwal", "Vikram Singh"],
-            "office_bearers": ["Ramesh Kumar Sharma (President)", "Sunita Devi Gupta (Secretary)", "Anil Kumar Verma (Treasurer)"],
+            "trustee_names": "Ramesh Kumar Sharma, Sunita Devi Gupta, Anil Kumar Verma, Priya Malhotra, Dr. Suresh Nair, Meena Agarwal, Vikram Singh",
+            "office_bearers": "Ramesh Kumar Sharma (President), Sunita Devi Gupta (Secretary), Anil Kumar Verma (Treasurer)",
             "non_profit_clause_present": True,
             "dissolution_clause_present": True,
         },
@@ -116,7 +114,7 @@ NGOS = [
             "csr_grant_present": True,
             "govt_grant_present": False,
             "fund_utilisation_present": True,
-            "grant_sources": ["Infosys Foundation CSR", "Individual Donors"],
+            "grant_sources": "Infosys Foundation CSR, Individual Donors",
         },
         "audit_report": {
             "auditor_name": "M/s Kapoor & Associates",
@@ -153,15 +151,13 @@ NGOS = [
             "status": "complete",
             "submitted_by": "officer@darpan.gov.in",
             "progress_step": 8,
-            "score": {
-                "overall_score": 71.0,
-                "label": "Mostly Compliant - Minor Gaps",
-                "grant_ready": False,
-                "pass_count": 3,
-                "fail_count": 2,
-                "uncertain_count": 2,
-                "corpus_gap_count": 0,
-            },
+            "overall_score": 71.0,
+            "score_label": "Mostly Compliant - Minor Gaps",
+            "grant_ready": False,
+            "pass_count": 3,
+            "fail_count": 2,
+            "uncertain_count": 2,
+            "corpus_gap_count": 0,
         },
         "documents": [
             {"doc_type": "trust_deed",               "file_name": "grameen_trust_deed.pdf",      "file_size": 614400,  "ocr_method": "pymupdf",    "ocr_quality": "good"},
@@ -180,8 +176,8 @@ NGOS = [
             "amendment_clause": "Amendments require unanimous consent of all trustees",
             "org_address": "Survey No. 45, Shivapur Road, Pune - 412301, Maharashtra",
             "trustee_count": 9,
-            "trustee_names": ["Dattatray Bhosale", "Sunanda Patil", "Rajendra Kadam", "Lata Deshmukh", "Narayan Jadhav", "Sushila Mane", "Balasaheb Shinde", "Kavita Pawar", "Arun Kulkarni"],
-            "office_bearers": ["Dattatray Bhosale (Chairman)", "Sunanda Patil (Secretary)", "Rajendra Kadam (Treasurer)"],
+            "trustee_names": "Dattatray Bhosale, Sunanda Patil, Rajendra Kadam, Lata Deshmukh, Narayan Jadhav, Sushila Mane, Balasaheb Shinde, Kavita Pawar, Arun Kulkarni",
+            "office_bearers": "Dattatray Bhosale (Chairman), Sunanda Patil (Secretary), Rajendra Kadam (Treasurer)",
             "non_profit_clause_present": True,
             "dissolution_clause_present": True,
         },
@@ -214,7 +210,7 @@ NGOS = [
             "csr_grant_present": True,
             "govt_grant_present": True,
             "fund_utilisation_present": False,
-            "grant_sources": ["NABARD Rural Infrastructure Fund", "Tata Trusts CSR", "State Government MREGS"],
+            "grant_sources": "NABARD Rural Infrastructure Fund, Tata Trusts CSR, State Government MREGS",
         },
         "audit_report": {
             "auditor_name": "M/s Joshi & Gokhale Associates",
@@ -251,15 +247,13 @@ NGOS = [
             "status": "complete",
             "submitted_by": "officer@darpan.gov.in",
             "progress_step": 8,
-            "score": {
-                "overall_score": 88.5,
-                "label": "Compliant - Grant Ready",
-                "grant_ready": True,
-                "pass_count": 6,
-                "fail_count": 0,
-                "uncertain_count": 1,
-                "corpus_gap_count": 0,
-            },
+            "overall_score": 88.5,
+            "score_label": "Compliant - Grant Ready",
+            "grant_ready": True,
+            "pass_count": 6,
+            "fail_count": 0,
+            "uncertain_count": 1,
+            "corpus_gap_count": 0,
         },
         "documents": [
             {"doc_type": "trust_deed",               "file_name": "vidya_moa.pdf",               "file_size": 573440,  "ocr_method": "pymupdf",    "ocr_quality": "good"},
@@ -278,8 +272,8 @@ NGOS = [
             "amendment_clause": "Amendments require three-fourths majority at a special general meeting",
             "org_address": "No. 78, 2nd Cross, Rajajinagar, Bengaluru - 560010, Karnataka",
             "trustee_count": 11,
-            "trustee_names": ["Prof. Nagesh Rao", "Dr. Shobha Krishnamurthy", "Ravi Shankar Hegde", "Usha Srinivasan", "Manjunath Gowda", "Kavitha Nair", "Suresh Bhat", "Anitha Murthy", "Prakash Reddy", "Leela Devi", "Chandrashekar Iyengar"],
-            "office_bearers": ["Prof. Nagesh Rao (President)", "Dr. Shobha Krishnamurthy (Secretary)", "Ravi Shankar Hegde (Treasurer)"],
+            "trustee_names": "Prof. Nagesh Rao, Dr. Shobha Krishnamurthy, Ravi Shankar Hegde, Usha Srinivasan, Manjunath Gowda, Kavitha Nair, Suresh Bhat, Anitha Murthy, Prakash Reddy, Leela Devi, Chandrashekar Iyengar",
+            "office_bearers": "Prof. Nagesh Rao (President), Dr. Shobha Krishnamurthy (Secretary), Ravi Shankar Hegde (Treasurer)",
             "non_profit_clause_present": True,
             "dissolution_clause_present": True,
         },
@@ -312,7 +306,7 @@ NGOS = [
             "csr_grant_present": False,
             "govt_grant_present": True,
             "fund_utilisation_present": True,
-            "grant_sources": ["Karnataka State Government Education Department", "Individual Donors"],
+            "grant_sources": "Karnataka State Government Education Department, Individual Donors",
         },
         "audit_report": {
             "auditor_name": "M/s Shenoy & Kamath LLP",
@@ -342,13 +336,12 @@ NGOS = [
 def seed():
     db = SessionLocal()
     try:
-        print("\n--- Seeding NGO Compliance Database ---\n")
+        print("\n--- Seeding NGO Compliance Database (Flat Relational Mode) ---\n")
 
         for ngo in NGOS:
             s = ngo["submission"]
             sid = s["id"]
 
-            # Check if already seeded
             exists = db.query(Submission).filter(Submission.id == sid).first()
             if exists:
                 print(f"  [SKIP] {s['org_name']} — already in database.")
@@ -373,26 +366,15 @@ def seed():
                     **{k: v for k, v in doc.items() if k not in ("file_size", "ocr_method", "ocr_quality")},
                 ))
 
-            # 3. ExtractedFields (merged JSON)
-            merged = {
-                **ngo["trust_deed"],
-                **ngo["reg_cert"],
-                **(ngo["cert_12a"] or {}),
-                **(ngo["cert_80g"] or {}),
-                **(ngo["fcra"] or {}),
-                **(ngo["annual_report"] or {}),
-                **(ngo["audit_report"] or {}),
-                **(ngo["pan_card"] or {}),
-            }
+            # 3. ExtractedFields (Metadata row)
             db.add(ExtractedFields(
                 submission_id=sid,
-                merged_fields=merged,
-                extraction_log=[{"step": "trust_deed", "fields_found": len(ngo["trust_deed"])},
-                                {"step": "reg_cert", "fields_found": len(ngo["reg_cert"])}],
+                total_fields_extracted=len(ngo["trust_deed"]) + len(ngo["reg_cert"]),
+                extraction_status="complete",
                 created_at=ts(),
             ))
 
-            # 4. Document-specific tables
+            # 4. Document-specific tables (Flat scalar columns)
             db.add(ExtractedTrustDeed(submission_id=sid, **ngo["trust_deed"]))
             db.add(ExtractedRegistrationCertificate(submission_id=sid, **ngo["reg_cert"]))
             if ngo["cert_12a"]:

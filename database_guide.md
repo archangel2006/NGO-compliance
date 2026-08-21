@@ -1,6 +1,6 @@
 # NGO Compliance Verification System — Database Guide & Table Explorer
 
-This document provides a reference guide for exploring and showcasing all **13 relational database tables** populated with sample NGO compliance data.
+This document provides a step-by-step guide to explore and showcase all **13 relational database tables** populated with NGO compliance data.
 
 ---
 
@@ -8,127 +8,141 @@ This document provides a reference guide for exploring and showcasing all **13 r
 * **Database File**: `ngo_compliance.db` (SQLite) / `ngo_compliance` (PostgreSQL)
 * **Total Tables**: 13
 * **Total Records**: 76
-* **Seeded NGOs**:
+* **Seeded NGO Profiles**:
   1. **Asha Jyoti Welfare Foundation** (Delhi — Public Trust)
   2. **Maharashtra Grameen Seva Trust** (Maharashtra — Public Trust)
   3. **Vidya Vardhini Education Society** (Karnataka — Society)
 
 ---
 
-## 💻 Commands to View Tables
+## 🚀 Terminal Commands (Command-Line Inspection)
 
-Run these commands from your terminal inside the project root (`NGO-compliance`):
+### Step 1: Activate Virtual Environment (Run Once)
+Before running any table inspection commands, activate your virtual environment:
 
-### 1. View Summary of All 13 Tables
 ```powershell
-.venv\Scripts\python.exe -m backend.tests.view_tables
+.venv\Scripts\activate
 ```
 
 ---
 
-### 2. Commands to View Specific Tables
+### Step 2: List All 13 Tables & Summary
+To display the list of all 13 database tables along with their row counts:
+
+```powershell
+python -m backend.tests.view_tables
+```
+
+---
+
+### Step 3: Inspect Specific Table Structure & Full Data
+
+Running `python -m backend.tests.view_tables <table_name>` prints the full column structure, data types, and all populated row data for that table.
 
 #### Core Application Tables
-* **View Submissions (NGO Profiles & Compliance Scores)**:
+* **Master NGO Submissions (Flat Scores & Status)**:
   ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables submissions
+  python -m backend.tests.view_tables submissions
   ```
 
-* **View Compliance Findings (AI Reasoning, Status, Citations, Evidence per Dimension)**:
+* **Compliance Findings (AI Reasoning, Status, Legal Citations per Dimension)**:
   ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables compliance_findings
+  python -m backend.tests.view_tables compliance_findings
   ```
 
-* **View Human Review Queue (Blinded Officer Queue for Uncertain Findings)**:
+* **Human Review Queue (Blinded Officer Queue for Uncertain Findings)**:
   ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables human_review_queue
+  python -m backend.tests.view_tables human_review_queue
   ```
 
-* **View Uploaded Documents (File Registry, OCR Status, Quality)**:
+* **Uploaded Documents (File Registry, OCR Status, Quality)**:
   ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables uploaded_documents
+  python -m backend.tests.view_tables uploaded_documents
   ```
 
-* **View Merged Extracted Fields (Combined Flat JSON for RAG Pipeline)**:
+* **Merged Extracted Fields (Metadata & Field Summaries)**:
   ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_fields
-  ```
-
----
-
-#### Document-Specific Extracted Fact Tables (13-Table Relational Schema)
-
-* **View Extracted Trust Deeds (Quorum, Trustees, Office Bearers, Non-profit Clause)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_trust_deeds
-  ```
-
-* **View Extracted Registration Certificates (Registration No, Authority, Act, State)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_registration_certificates
-  ```
-
-* **View Extracted Tax 12A / 12AB Certificates (Certificate No, Expiry, Form 10AB)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_12a_certificates
-  ```
-
-* **View Extracted Tax 80G Certificates (80G No, Deduction Rate, Expiry)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_80g_certificates
-  ```
-
-* **View Extracted FCRA Certificates (FCRA Reg No, SBI Main Branch Account)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_fcra_certificates
-  ```
-
-* **View Extracted Annual Reports (Receipts, Expenditure, CSR & Govt Grant Flags)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_annual_reports
-  ```
-
-* **View Extracted Audit Reports (Auditor Name, ICAI Reg No, FCRA Audit Flag)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_audit_reports
-  ```
-
-* **View Extracted PAN Cards (PAN Number, Registered Name)**:
-  ```powershell
-  .venv\Scripts\python.exe -m backend.tests.view_tables extracted_pan_cards
+  python -m backend.tests.view_tables extracted_fields
   ```
 
 ---
 
-## 🗂️ Complete List of 13 Database Tables
+#### Document-Specific Relational Fact Tables (Flat Columns)
+
+* **Trust Deeds / MOA (Quorum, Trustees, Office Bearers, Dissolution Clauses)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_trust_deeds
+  ```
+
+* **Registration Certificates (Reg Number, Authority, Act, State)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_registration_certificates
+  ```
+
+* **Income Tax 12A / 12AB Certificates (12AB Reg No, Expiry, Form 10AB)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_12a_certificates
+  ```
+
+* **Income Tax 80G Certificates (80G Reg No, Deduction Rate, Expiry)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_80g_certificates
+  ```
+
+* **FCRA Certificates (FCRA Reg No, SBI Main Branch Account Check)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_fcra_certificates
+  ```
+
+* **Annual Reports (Total Receipts, Expenditure, CSR & Govt Grants)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_annual_reports
+  ```
+
+* **CA Audit Reports (Auditor Name, ICAI Reg No, FCRA Audit Flag)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_audit_reports
+  ```
+
+* **PAN Cards (PAN Number, Registered Entity Name)**:
+  ```powershell
+  python -m backend.tests.view_tables extracted_pan_cards
+  ```
+
+---
+
+## 🖼️ Visual GUI Inspection Methods (Spreadsheet / Grid View)
+
+For live demonstrations and presentations to mentors, you can view the database as a visual Excel-like grid:
+
+### Method 1: VS Code SQLite Viewer Extension (Recommended)
+1. Open VS Code **Extensions** (`Ctrl + Shift + X`).
+2. Search for **SQLite Viewer** (by *qwtel*) and click **Install**.
+3. In the VS Code file explorer on the left, right-click `ngo_compliance.db` and select **Open Database**.
+4. Click any table from the sidebar to view rows and columns in a spreadsheet layout.
+
+### Method 2: DB Browser for SQLite (Standalone GUI App)
+1. Download **DB Browser for SQLite** (free): `https://sqlitebrowser.org/`
+2. Launch the app and click **Open Database**.
+3. Select `ngo_compliance.db` from your project folder.
+4. Click the **Browse Data** tab to view, search, and filter all 13 tables.
+
+---
+
+## 🗂️ Complete 13-Table Schema Overview
 
 | # | Table Name | Rows | Description |
 |---|---|---|---|
-| 1 | `submissions` | 3 | Master NGO registrations (Org name, State, Entity Type, PAN, Sector, Score, Status) |
+| 1 | `submissions` | 3 | Master NGO registrations (Org name, State, Entity Type, PAN, Flat Scores, Status) |
 | 2 | `uploaded_documents` | 22 | File upload registry (Path, Doc Type, OCR Status, Quality) |
-| 3 | `extracted_fields` | 3 | Combined JSON store of all extracted fields used by RAG pipeline |
+| 3 | `extracted_fields` | 3 | Extraction metadata and field count tracking |
 | 4 | `extracted_trust_deeds` | 3 | Trust deed attributes (Quorum, Trustees, Non-profit & Dissolution clauses) |
 | 5 | `extracted_registration_certificates` | 3 | Registration cert attributes (Reg No, Act registered under, Registering authority) |
 | 6 | `extracted_12a_certificates` | 3 | Income Tax 12A/12AB cert attributes (12AB No, Expiry Date, Form Ref) |
 | 7 | `extracted_80g_certificates` | 3 | Income Tax 80G cert attributes (80G No, Deduction Rate, Expiry) |
 | 8 | `extracted_fcra_certificates` | 1 | FCRA cert attributes (FCRA Reg No, SBI New Delhi Main Branch check) |
-| 9 | `extracted_annual_reports` | 3 | Financial receipts, expenditure, CSR grants, and utilisation statements |
+| 9 | `extracted_annual_reports` | 3 | Financial receipts, expenditure, CSR grants, and grant sources |
 | 10 | `extracted_audit_reports` | 3 | Statutory auditor details, ICAI firm registration, separate FCRA audit flag |
 | 11 | `extracted_pan_cards` | 3 | PAN Card details and cross-reference verification |
 | 12 | `compliance_findings` | 21 | AI compliance evaluation across 7 dimensions per NGO (Citations, Evidence, Reasoning) |
 | 13 | `human_review_queue` | 5 | Blinded compliance officer queue for uncertain AI findings |
-
----
-
-## 🖼️ GUI Inspection Option for Presentations
-
-To show a visual database GUI during a live demo or presentation:
-
-1. **Option A: VS Code SQLite Viewer Extension**
-   * Install **"SQLite Viewer"** in VS Code.
-   * Right-click `ngo_compliance.db` in VS Code file explorer -> Select **"Open Database"**.
-
-2. **Option B: DB Browser for SQLite (GUI App)**
-   * Download & open **DB Browser for SQLite**.
-   * Click **"Open Database"** -> Choose `ngo_compliance.db`.
-   * Click the **"Browse Data"** tab to switch between all 13 tables.

@@ -1,4 +1,4 @@
-# Database-backed store — swaps out transient in-memory dicts for PostgreSQL.
+# Database-backed store — swaps out transient in-memory dicts for PostgreSQL/SQLite.
 # Maintains backward-compatible dictionary interfaces for all FastAPI routers.
 
 from datetime import datetime
@@ -18,7 +18,7 @@ def now():
 
 class RowDict(dict):
     """
-    A custom dict subclass that intercepts mutations (like RowDict['status'] = 'processing')
+    Custom dict subclass that intercepts mutations (like RowDict['status'] = 'processing')
     and writes them back to the database via its parent wrapper.
     """
     def __init__(self, initial_dict, wrapper, row_key):
@@ -46,7 +46,7 @@ class RowDict(dict):
 
 class DbDictWrapper(collections.abc.MutableMapping):
     """
-    A dictionary interface backed by a PostgreSQL database table.
+    A dictionary interface backed by a relational database table.
     Ensures seamless compatibility with all dict operations in FastAPI routers.
     """
     def __init__(self, model_class, key_field="id"):
@@ -63,12 +63,36 @@ class DbDictWrapper(collections.abc.MutableMapping):
         for c in obj.__table__.columns:
             val = getattr(obj, c.name)
             d[c.name] = val
+        
+        # Virtual dictionary mapping for Submission 'score'
+        if self.model_class == Submission:
+            if obj.overall_score is not None or obj.score_label is not None:
+                d["score"] = {
+                    "overall_score": obj.overall_score,
+                    "label": obj.score_label,
+                    "grant_ready": obj.grant_ready,
+                    "pass_count": obj.pass_count or 0,
+                    "fail_count": obj.fail_count or 0,
+                    "uncertain_count": obj.uncertain_count or 0,
+                    "corpus_gap_count": obj.corpus_gap_count or 0,
+                }
+            else:
+                d["score"] = None
+
         return RowDict(d, self, getattr(obj, self.key_field))
 
     def _to_model(self, d, session):
         obj = self.model_class()
         for k, v in d.items():
-            if hasattr(obj, k):
+            if k == "score" and isinstance(v, dict) and self.model_class == Submission:
+                obj.overall_score = v.get("overall_score")
+                obj.score_label = v.get("label")
+                obj.grant_ready = v.get("grant_ready")
+                obj.pass_count = v.get("pass_count", 0)
+                obj.fail_count = v.get("fail_count", 0)
+                obj.uncertain_count = v.get("uncertain_count", 0)
+                obj.corpus_gap_count = v.get("corpus_gap_count", 0)
+            elif hasattr(obj, k):
                 setattr(obj, k, v)
         return obj
 
@@ -93,7 +117,15 @@ class DbDictWrapper(collections.abc.MutableMapping):
             ).first()
             if row:
                 for k, v in value.items():
-                    if hasattr(row, k):
+                    if k == "score" and isinstance(v, dict) and self.model_class == Submission:
+                        row.overall_score = v.get("overall_score")
+                        row.score_label = v.get("label")
+                        row.grant_ready = v.get("grant_ready")
+                        row.pass_count = v.get("pass_count", 0)
+                        row.fail_count = v.get("fail_count", 0)
+                        row.uncertain_count = v.get("uncertain_count", 0)
+                        row.corpus_gap_count = v.get("corpus_gap_count", 0)
+                    elif hasattr(row, k):
                         setattr(row, k, v)
             else:
                 row = self._to_model(value, session)
@@ -165,8 +197,17 @@ class DbDictWrapper(collections.abc.MutableMapping):
             row = session.query(self.model_class).filter(
                 getattr(self.model_class, self.key_field) == str(row_key)
             ).first()
-            if row and hasattr(row, col_name):
-                setattr(row, col_name, val)
+            if row:
+                if col_name == "score" and isinstance(val, dict) and self.model_class == Submission:
+                    row.overall_score = val.get("overall_score")
+                    row.score_label = val.get("label")
+                    row.grant_ready = val.get("grant_ready")
+                    row.pass_count = val.get("pass_count", 0)
+                    row.fail_count = val.get("fail_count", 0)
+                    row.uncertain_count = val.get("uncertain_count", 0)
+                    row.corpus_gap_count = val.get("corpus_gap_count", 0)
+                elif hasattr(row, col_name):
+                    setattr(row, col_name, val)
                 session.commit()
         except Exception as e:
             session.rollback()
@@ -197,7 +238,15 @@ class DbDictWrapper(collections.abc.MutableMapping):
             ).first()
             if row:
                 for k, v in d.items():
-                    if hasattr(row, k):
+                    if k == "score" and isinstance(v, dict) and self.model_class == Submission:
+                        row.overall_score = v.get("overall_score")
+                        row.score_label = v.get("label")
+                        row.grant_ready = v.get("grant_ready")
+                        row.pass_count = v.get("pass_count", 0)
+                        row.fail_count = v.get("fail_count", 0)
+                        row.uncertain_count = v.get("uncertain_count", 0)
+                        row.corpus_gap_count = v.get("corpus_gap_count", 0)
+                    elif hasattr(row, k):
                         setattr(row, k, v)
                 session.commit()
         except Exception as e:
@@ -213,7 +262,7 @@ DOCUMENTS   = DbDictWrapper(UploadedDocument)
 EXTRACTED   = DbDictWrapper(ExtractedFields, key_field="submission_id")
 FINDINGS    = DbDictWrapper(ComplianceFinding)
 QUEUE       = DbDictWrapper(HumanReviewQueue)
-REPORTS     = {}  # Legacy dictionary — report generation writes directly to disk
+REPORTS     = {}
 
 
 # ── Helpers ───────────────────────────────────────────────────────────
