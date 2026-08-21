@@ -6,7 +6,7 @@ from backend.auth import get_current_user
 from backend.store import (
     SUBMISSIONS, DOCUMENTS, EXTRACTED, FINDINGS, QUEUE,
     new_id, now,
-    get_submission, get_documents_for_submission,
+    get_submission, get_documents_for_submission, get_findings_for_submission,
 )
 from backend.services.ocr import extract_text
 from backend.services.extraction import extract_all
@@ -124,7 +124,7 @@ def _run_assessment(submission_id: str):
         # Save findings array to assessment_results/{submission_id}.json
         results_dir = Path("assessment_results")
         results_dir.mkdir(parents=True, exist_ok=True)
-        findings_list = [FINDINGS[fid] for fid in FINDINGS if FINDINGS[fid]["submission_id"] == submission_id]
+        findings_list = get_findings_for_submission(submission_id)
         with open(results_dir / f"{submission_id}.json", "w") as f:
             json.dump({
                 "submission_id": submission_id,

@@ -30,3 +30,8 @@ httpx
 # External llms
 google-genai
 google-generativeai
+
+# Database
+sqlalchemy>=2.0.0 # (SQL Toolkit & ORM)
+psycopg2-binary>=2.9.0  # (PostgreSQL Database Adapter)
+alembic>=1.11.0 # (Database Migrations Manager)

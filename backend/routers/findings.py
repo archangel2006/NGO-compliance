@@ -25,27 +25,27 @@ def get_findings(submission_id: str,
                 cached = json.load(f)
             
             # Restore submission in store if missing
+            # With PostgreSQL, data survives restarts — no need to restore from JSON.
+            # If not in DB, try loading from disk as a last resort.
             if not sub:
                 sub = {
                     "id": submission_id,
-                    "org_name": "Cached NGO",
-                    "state": "maharashtra",
-                    "entity_type": "Public Trust",
+                    "org_name": cached.get("submission", {}).get("org_name", "Cached NGO"),
+                    "state": cached.get("submission", {}).get("state", "maharashtra"),
+                    "entity_type": cached.get("submission", {}).get("entity_type", "Public Trust"),
                     "status": "complete",
                     "score": cached.get("score", {}),
                     "created_at": store_now(),
-                    "updated_at": store_now()
+                    "updated_at": store_now(),
                 }
                 SUBMISSIONS[submission_id] = sub
-            
-            # Restore findings in store if missing
-            cached_findings = cached.get("findings", [])
-            for f_item in cached_findings:
-                fid = f_item.get("id") or f_item.get("dimension_id")
-                if fid not in FINDINGS:
-                    FINDINGS[fid] = f_item
-            
-            findings = get_findings_for_submission(submission_id)
+
+            if not findings:
+                for f_item in cached.get("findings", []):
+                    fid = f_item.get("id")
+                    if fid:
+                        FINDINGS[fid] = f_item
+                findings = get_findings_for_submission(submission_id)
         except Exception as e:
             print(f"Error loading cached findings: {e}")
 
