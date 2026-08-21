@@ -1,5 +1,5 @@
 [build]
-  base = "ngo-compliance-frontend"
+  base = "demo"
   command = "npm run build"
   publish = ".next"
 
