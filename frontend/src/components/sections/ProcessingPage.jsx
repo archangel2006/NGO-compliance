@@ -15,6 +15,7 @@ export default function ProcessingPage({ go }) {
   const [orgName, setOrgName] = useState("");
   const [stateName, setStateName] = useState("");
   const [entityType, setEntityType] = useState("");
+  const [docCount, setDocCount] = useState(0);
   const assessStarted = useRef(false);
 
   useEffect(() => {
@@ -31,6 +32,9 @@ export default function ProcessingPage({ go }) {
         const rawState = details.state || "";
         setStateName(STATE_CODE_MAP[rawState.toLowerCase()] || rawState);
         setEntityType(details.entity_type || "");
+        if (Array.isArray(details.documents)) {
+          setDocCount(details.documents.length);
+        }
       })
       .catch(() => {});
 
@@ -81,7 +85,7 @@ export default function ProcessingPage({ go }) {
             <div style={{ textAlign: "center", marginBottom: 22 }}>
               <div style={{ fontSize: 38, marginBottom: 8 }}>{step >= STEPS.length ? "✅" : "⚙️"}</div>
               <h2 style={{ color: THEME.NV, fontWeight: 800, margin: "0 0 4px", fontSize: 17 }}>{step >= STEPS.length ? "Analysis Complete" : "Analysing Documents…"}</h2>
-              <p style={{ color: THEME.MT, margin: 0, fontSize: 12 }}>{orgName || "NGO"} · {stateName || "—"} · {entityType || "—"}</p>
+              <p style={{ color: THEME.MT, margin: 0, fontSize: 12 }}>{orgName || "NGO"} · {stateName || "—"} · {entityType || "—"}{docCount > 0 ? ` · (${docCount} file${docCount > 1 ? "s" : ""})` : ""}</p>
             </div>
             <div style={{ marginBottom: 18 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: THEME.MT, marginBottom: 4 }}>

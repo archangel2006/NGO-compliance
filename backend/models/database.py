@@ -1,14 +1,16 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+backend_dir = Path(__file__).parent.parent
+load_dotenv(backend_dir / ".env")
+load_dotenv()  # Fallback to root .env if present
 
-# Grabs the URL from your .env file
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/ngo_compliance")
-
-engine = create_engine(DATABASE_URL)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./ngo_compliance.db")
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

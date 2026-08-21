@@ -16,6 +16,7 @@ STATUS_BASE_SCORES = {
     "FAIL":       0.0,
     "UNCERTAIN":  0.5,
     "CORPUS_GAP": 0.5,  # neutral — system limitation, not NGO failure
+    "MISSING":    0.0,  # 0 points — required document not provided
 }
 
 
@@ -26,17 +27,18 @@ def calculate_score(findings: list) -> dict:
 
     for f in findings:
         weight      = DIMENSION_WEIGHTS.get(f.dimension_id, 0.10)
-        base        = STATUS_BASE_SCORES.get(f.status, 0.5)
+        base        = STATUS_BASE_SCORES.get(f.status, 0.0)
         confidence  = f.confidence
 
         # Confidence-adjusted: partial credit for uncertain PASS/FAIL
         # High confidence PASS  → 1.0 × weight
         # Low confidence PASS   → 0.75 × weight (less sure)
         # UNCERTAIN             → 0.5 × weight regardless of confidence
+        # MISSING / CORPUS_GAP  → flat base score
         if f.status in ("PASS", "FAIL"):
             adjusted = base * confidence + 0.5 * (1 - confidence)
         else:
-            adjusted = base  # UNCERTAIN/CORPUS_GAP not confidence-adjusted
+            adjusted = base  # UNCERTAIN/CORPUS_GAP/MISSING not confidence-adjusted
 
         weighted_total += adjusted * weight
         weight_sum     += weight
@@ -61,6 +63,7 @@ def calculate_score(findings: list) -> dict:
         "fail_count":    sum(1 for f in findings if f.status == "FAIL"),
         "uncertain_count": sum(1 for f in findings if f.status == "UNCERTAIN"),
         "corpus_gap_count": sum(1 for f in findings if f.status == "CORPUS_GAP"),
+        "missing_count": sum(1 for f in findings if f.status == "MISSING"),
     }
 
 

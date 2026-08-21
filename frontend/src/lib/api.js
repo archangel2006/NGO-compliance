@@ -162,13 +162,13 @@ export const FINDINGS = [
 ];
 
 export const STEPS = [
-  "Receiving uploaded documents (7 files · 13.2 MB)",
+  "Receiving uploaded documents",
   "Extracting text with PyMuPDF…",
   "Running Tesseract OCR — lang: eng+mar",
   "Structured field extraction (names, dates, reg numbers)",
   "Querying legal corpus — State Acts · FCRA · IT Act",
-  "Assessing 7 compliance dimensions via RAG + LLM",
-  "Routing 2 findings to Human Review Queue",
+  "Assessing compliance dimensions via RAG + LLM",
+  "Routing findings to Human Review Queue",
   "Generating compliance report",
 ];
 

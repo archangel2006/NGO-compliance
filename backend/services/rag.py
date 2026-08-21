@@ -726,6 +726,21 @@ def assess_dimension(dimension: dict, ngo_json: dict,
     # Build/extract evidence fields first
     ngo_evidence = extract_evidence(ngo_json, dimension["evidence_fields"])
 
+    # Early exit: document not uploaded — skip LLM entirely, flag as MISSING
+    if ngo_evidence == "No relevant fields extracted.":
+        return Finding(
+            dimension_id=dimension["id"],
+            dimension_name=dimension["name"],
+            status="MISSING",
+            confidence=0.0,
+            legal_citation="",
+            ngo_evidence="Document not uploaded.",
+            reasoning=f"No documents providing evidence for '{dimension['name']}' were uploaded. "
+                      f"Upload the required document to enable assessment.",
+            routing="auto_report",
+            citation_valid=False,
+        )
+
     # 1. Retrieve context if not provided precomputed
     if primary_chunk is None:
         query = dimension["query"].format(
@@ -914,9 +929,29 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
     # 1. Gather active dimensions and retrieve context
     active_dimensions = {}
     gap_findings = {}
+    missing_findings = {}
 
     for dim in DIMENSIONS:
         query = dim["query"].format(state=canonical_state, entity_type=entity_type)
+        ngo_evidence = extract_evidence(ngo_json, dim["evidence_fields"])
+
+        # Check if document evidence is missing for this dimension
+        if ngo_evidence == "No relevant fields extracted.":
+            print(f"[RAG] {dim['id']}: No document evidence present — marking as MISSING.")
+            missing_findings[dim["id"]] = Finding(
+                dimension_id=dim["id"],
+                dimension_name=dim["name"],
+                status="MISSING",
+                confidence=0.0,
+                legal_citation="",
+                ngo_evidence="Document not uploaded.",
+                reasoning=f"No documents providing evidence for '{dim['name']}' were uploaded. "
+                          f"Upload the required document to enable assessment.",
+                routing="auto_report",
+                citation_valid=False,
+            )
+            continue
+
         chunks, metas = retrieve_legal_context(query, canonical_state)
 
         if not chunks:
@@ -939,7 +974,6 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
             support2_meta      = metas[2] if len(metas) > 2 else {}
             supporting_chunk_1 = chunks[1] if len(chunks) > 1 else ""
             supporting_chunk_2 = chunks[2] if len(chunks) > 2 else ""
-            ngo_evidence       = extract_evidence(ngo_json, dim["evidence_fields"])
             dim_issues         = _filter_consistency_issues(all_consistency, dim)
 
             # Retrieval audit log — shows which legal chunks were selected per dimension
@@ -988,7 +1022,9 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
     for dim in DIMENSIONS:
         dim_id = dim["id"]
         print(f"  Assessing: {dim['name']}...")
-        if dim_id in gap_findings:
+        if dim_id in missing_findings:
+            finding = missing_findings[dim_id]
+        elif dim_id in gap_findings:
             finding = gap_findings[dim_id]
         else:
             dim_data = active_dimensions[dim_id]
