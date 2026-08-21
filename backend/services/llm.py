@@ -1,18 +1,19 @@
 import json
 import re
-import google.generativeai as genai
 from typing import Optional
 from dotenv import load_dotenv
 import os
+import ollama
+from ollama import Client
 
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# Instantiate Ollama Client using base url config
+client = Client(host=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))
 
-genai.configure(api_key=GEMINI_API_KEY)
-
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+LLM_MODEL = os.getenv("LLM_MODEL", "mistral")
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
 
 TEMPERATURE = 0.1   # low temp — legal reasoning needs consistency
 
@@ -27,43 +28,21 @@ def generate(prompt: str, system: Optional[str] = None,
         full_prompt += system + "\n\n"
     full_prompt += prompt
 
-    env_model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
-    fallback_candidates = [
-        "gemini-3.5-flash",
-        "gemini-3.1-flash-lite",
-        "gemini-flash-latest",
-        "gemini-pro-latest"
-    ]
-    MODELS = []
-    if env_model:
-        MODELS.append(env_model)
-    for m in fallback_candidates:
-        if m not in MODELS:
-            MODELS.append(m)
-
-    last_error = None
-
-    for model_name in MODELS:
-        try:
-            print(f"[LLM] Trying model {model_name}...")
-
-            model = genai.GenerativeModel(model_name)
-
-            response = model.generate_content(
-                full_prompt,
-                generation_config={
-                    "temperature": TEMPERATURE,
-                }
-            )
-
-            print(f"[LLM] Successfully generated using {model_name}")
-            return response.text
-
-        except Exception as e:
-            print(f"[LLM] Model {model_name} failed: {e}")
-            last_error = e
-
-    raise Exception(f"All Gemini models failed. Last error: {last_error}")
+    print(f"[LLM] Calling Ollama ({LLM_MODEL}) (prompt={len(full_prompt)} chars)...")
+    try:
+        response = client.generate(
+            model=LLM_MODEL,
+            prompt=full_prompt,
+            options={
+                "temperature": TEMPERATURE,
+                "num_ctx": OLLAMA_NUM_CTX
+            }
+        )
+        print(f"[LLM] Successfully generated using local Ollama model {LLM_MODEL}")
+        return response["response"]
+    except Exception as e:
+        print(f"[LLM] Ollama model {LLM_MODEL} failed: {e}")
+        raise e
 
 # ── JSON parsing (handles common LLM output failures) ────────────
 
@@ -185,19 +164,22 @@ legal provisions. Return ONLY a JSON array of strings:
 # ── Quick health check ────────────────────────────────────────────
 
 def check_llm_available():
-    """Check Gemini API connectivity."""
+    """Check Ollama connectivity and model loading."""
 
     try:
-        model = genai.GenerativeModel(LLM_MODEL)
-
-        response = model.generate_content(
-            'Reply only with {"status":"ok"}'
+        response = client.generate(
+            model=LLM_MODEL,
+            prompt='Reply only with {"status":"ok"}',
+            options={
+                "temperature": 0.1,
+                "num_ctx": OLLAMA_NUM_CTX
+            }
         )
 
         return {
             "available": True,
             "model": LLM_MODEL,
-            "response": response.text
+            "response": response["response"]
         }
 
     except Exception as e:

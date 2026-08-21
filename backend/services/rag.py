@@ -2,7 +2,6 @@ import os
 import re
 import chromadb
 import ollama
-import google.generativeai as genai
 from backend.services.llm import generate
 import json
 from pathlib import Path
@@ -16,8 +15,6 @@ import difflib
 backend_dir = Path(__file__).parent.parent
 load_dotenv(backend_dir / ".env")
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
 env_vectorstore = os.getenv("VECTORSTORE_PATH")
 if env_vectorstore:
     VECTORSTORE = (backend_dir / env_vectorstore).resolve()
@@ -25,7 +22,7 @@ else:
     VECTORSTORE = (backend_dir / "../vectorstore").resolve()
 
 EMBED_MODEL  = os.getenv("EMBED_MODEL", "nomic-embed-text")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+LLM_MODEL    = os.getenv("LLM_MODEL", "mistral")
 COLLECTION   = "legal_corpus"
 
 chroma_client = chromadb.PersistentClient(path=str(VECTORSTORE))
@@ -342,21 +339,26 @@ Please evaluate the compliance categories enclosed in the <dimension> tags below
 
 TASK: Evaluate each dimension independently.
 
-STRICT ISOLATION RULES:
+STRICT ISOLATION & STATE AMENDMENT RULES:
 1. Evaluate every dimension strictly independently inside its own tag boundaries.
 2. Never reuse evidence across dimensions.
 3. Never reuse legal provisions across dimensions. Do not mix provisions from different <dimension> blocks.
 4. Never let a failure or inconsistency in one dimension affect another.
 5. Apply only the legal requirements relevant to the stated ENTITY TYPE ({entity_type}). Do not apply Society Act rules to Trusts, or Trust rules to Section 8 companies.
-6. Determine whether each legal provision actually applies to the selected entity type. If it does not apply, ignore that provision and return UNCERTAIN.
-7. Ignore provisions that belong to a different state than {state}.
+6. STATE AMENDMENT RULES FOR {state}:
+    a) Use only legal provisions applicable to {state}, or Central provisions that apply throughout India.
+    b) Treat amendment text for any other state as irrelevant background. Ignore it completely.
+    c) Never mention, cite, summarize, or rely upon amendments belonging to any other state, even if they appear inside the retrieved chunk.
+    d) Do not conclude that a law is inapplicable merely because the retrieved chunk contains amendments for other states.
+    e) If both applicable and non-applicable amendments appear in the same chunk, extract and use only the applicable legal text.
+    f) Cite only the Central Act or the {state}-applicable provision.
+7. For each retrieved legal provision, first determine whether it applies to the selected entity type and jurisdiction. Ignore any provision that is not applicable. Continue evaluating using the remaining applicable provisions. Return UNCERTAIN only if no applicable legal provision remains after filtering.
 8. Evidence outside the current <ngo_evidence> block must be treated as nonexistent. Never use evidence from another dimension.
-9. If no retrieved provision within a dimension's tags applies to this entity type, return UNCERTAIN for that dimension.
-10. Ignore irrelevant retrieved legal provisions rather than trying to reconcile them.
-11. PASS: evidence is present and clearly satisfies the legal provision.
-12. FAIL: evidence contradicts the provision; OR a consistency issue listed under that dimension affects the fields for that dimension.
-13. UNCERTAIN: evidence is absent or ambiguous. Do NOT assume compliance from missing data.
-14. Keep reasoning concise and specific (1-3 sentences referencing actual field values).
+9. Ignore irrelevant retrieved legal provisions rather than trying to reconcile them.
+10. PASS: evidence is present and clearly satisfies the legal provision.
+11. FAIL: evidence contradicts the provision; OR a consistency issue listed under that dimension affects the fields for that dimension.
+12. UNCERTAIN: evidence is absent or ambiguous. Do NOT assume compliance from missing data.
+13. Keep reasoning concise and specific (1-3 sentences referencing actual field values).
 
 Return ONLY valid JSON matching the following schema structure, with no other text before or after:
 {{
@@ -414,7 +416,13 @@ Rules:
 - UNCERTAIN: evidence is absent or ambiguous. Do NOT assume compliance from missing data.
 - Contradictory evidence always overrides supporting evidence.
 - Determine whether each legal provision actually applies to the stated ENTITY TYPE ({entity_type}). If a provision belongs to a different entity type, ignore it.
-- Ignore provisions belonging to a different state than {state}.
+- STATE AMENDMENT RULES FOR {state}:
+  * Use only provisions explicitly applicable to {state}, provisions applicable to all India / Central Acts, or provisions explicitly marked as applicable to {state}.
+  * Ignore amendment paragraphs belonging to any other state (e.g. Haryana, Rajasthan, Odisha, Uttarakhand, Maharashtra, Karnataka, etc.).
+  * Do not conclude that a law is inapplicable merely because the retrieved chunk contains amendment text from another state.
+  * State amendment headings inside the chunk are contextual information only unless they match the NGO's state ({state}).
+  * When citing legislation, cite the underlying Central Act or {state}-applicable provision, not another state's amendment.
+  * If the chunk contains both applicable and non-applicable state amendments, use only the applicable portion and ignore the rest.
 - Apply only the legal requirements relevant to the stated ENTITY TYPE ({entity_type}).
   Do not apply Society Act rules to Trusts, or Trust rules to Section 8 companies.
 - If no retrieved provision applies to this entity type, return UNCERTAIN.
@@ -755,14 +763,10 @@ def assess_dimension(dimension: dict, ngo_json: dict,
             supporting_chunk_2=supporting_chunk_2,
         )
 
-        print(f"[RAG] Calling Gemini for dimension '{dimension['id']}' "
-              f"(model={LLM_MODEL}, prompt={len(prompt)} chars)...")
+        print(f"[RAG] Calling generate() for dimension '{dimension['id']}' "
+              f"(prompt={len(prompt)} chars)...")
         try:
-            raw = generate(
-                prompt,
-                system=None,
-                expect_json=True
-            )
+            raw = generate(prompt, system=None, expect_json=True)
             result = safe_parse_json(raw)
         except Exception as e:
             return Finding(
@@ -971,17 +975,13 @@ def run_full_assessment(ngo_json: dict, state: str, entity_type: str, submitted_
 
     if active_dimensions:
         prompt = build_combined_prompt(active_dimensions, canonical_state, entity_type)
-        print(f"[RAG] Calling Gemini for all active dimensions (prompt={len(prompt)} chars)...")
+        print(f"[RAG] Calling generate() for all active dimensions (prompt={len(prompt)} chars)...")
         try:
-            combined_raw_output = generate(
-                prompt,
-                system=None,
-                expect_json=True
-            )
-            print(f"[RAG] Gemini responded — {len(combined_raw_output)} chars")
+            combined_raw_output = generate(prompt, system=None, expect_json=True)
+            print(f"[RAG] generate() responded — {len(combined_raw_output)} chars")
             parsed_results = safe_parse_json(combined_raw_output)
         except Exception as e:
-            print(f"[RAG] ERROR during combined Gemini call: {e}")
+            print(f"[RAG] ERROR during combined Ollama call: {e}")
 
     # 3. Construct Findings
     findings = []
