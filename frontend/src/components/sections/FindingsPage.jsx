@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { THEME, NGO, FINDINGS, getFindings } from "@/lib/api";
+import { THEME, NGO, FINDINGS, getFindings, getSubmissionDetails } from "@/lib/api";
 import Crumb from "@/components/sections/Crumb";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -10,6 +10,7 @@ import Bar from "@/components/ui/Bar";
 
 export default function FindingsPage({ go }) {
   const [findingsState, setFindingsState] = useState([]);
+  const [orgName, setOrgName] = useState(NGO.name);
   const [open, setOpen] = useState(null);
   const [filter, setFilter] = useState("All");
 
@@ -19,6 +20,12 @@ export default function FindingsPage({ go }) {
       setFindingsState(FINDINGS);
       return;
     }
+
+    getSubmissionDetails(subId)
+      .then((details) => {
+        if (details.org_name) setOrgName(details.org_name);
+      })
+      .catch(() => {});
 
     getFindings(subId)
       .then((res) => {
@@ -55,7 +62,7 @@ export default function FindingsPage({ go }) {
       <div style={{ background: THEME.WH, borderBottom: `1px solid ${THEME.BD}`, padding: "8px 20px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
           <div>
-            <span style={{ fontSize: 14, fontWeight: 700, color: THEME.NV }}>{NGO.name}</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: THEME.NV }}>{orgName}</span>
             <span style={{ fontSize: 12, color: THEME.MT, marginLeft: 8 }}>· 7 dimensions</span>
           </div>
           <div style={{ display: "flex", gap: 5 }}>
@@ -104,9 +111,17 @@ export default function FindingsPage({ go }) {
                       </div>
                     </div>
                     {finding.qStatus === "reviewed" && (
-                      <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 7, padding: 12, marginBottom: 8 }}>
+                      <div style={{
+                        background: finding.determination === "PASS" ? "#ECFDF5" : "#FEE2E2",
+                        border: `1px solid ${finding.determination === "PASS" ? "#A7F3D0" : "#FCA5A5"}`,
+                        borderRadius: 7,
+                        padding: 12,
+                        marginBottom: 8
+                      }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                           <div style={{ fontSize: 10, fontWeight: 700, color: THEME.GR, textTransform: "uppercase" }}>Officer Determination: {finding.determination}</div>
+                           <div style={{ fontSize: 10, fontWeight: 700, color: finding.determination === "PASS" ? THEME.GR : THEME.RD, textTransform: "uppercase" }}>
+                             Officer Determination: {finding.determination}
+                           </div>
                           <span style={{ fontSize: 10, color: THEME.MT }}>{finding.reviewedAt}</span>
                         </div>
                         <div style={{ fontSize: 12, color: THEME.TX, lineHeight: 1.6 }}>{finding.officerNotes || "No notes provided."}</div>

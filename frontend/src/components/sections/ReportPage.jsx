@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
-import { THEME, NGO, FINDINGS, getFindings, getSubmissionDetails } from "@/lib/api";
+import { THEME, NGO, FINDINGS, getFindings, getSubmissionDetails, getReport } from "@/lib/api";
 import Crumb from "@/components/sections/Crumb";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -13,6 +13,9 @@ export default function ReportPage({ go }) {
   const [findingsState, setFindingsState] = useState([]);
   const [ngoDetails, setNgoDetails] = useState(NGO);
   const [loading, setLoading] = useState(true);
+  // Score sourced from backend report endpoint (recomputed with officer overrides)
+  const [reportScore, setReportScore] = useState(null);
+  const [reportCounts, setReportCounts] = useState({ pass: 0, fail: 0, uncertain: 0 });
 
   useEffect(() => {
     const subId = localStorage.getItem("active_submission_id");
@@ -27,7 +30,24 @@ export default function ReportPage({ go }) {
       try {
         const details = await getSubmissionDetails(subId);
         const res = await getFindings(subId);
-        
+
+        // Try to fetch report (which recomputes score including officer overrides)
+        let backendScore = null;
+        try {
+          const report = await getReport(subId);
+          if (report && report.overall_score != null) {
+            backendScore = report.overall_score;
+            setReportCounts({
+              pass:      report.pass_count      ?? 0,
+              fail:      report.fail_count      ?? 0,
+              uncertain: report.uncertain_count ?? 0,
+            });
+          }
+        } catch (_) {
+          // Report not yet available — will fall back to derived counts below
+        }
+        setReportScore(backendScore);
+
         setNgoDetails({
           name: details.org_name || NGO.name,
           id: details.darpan_id || NGO.id,
@@ -55,6 +75,7 @@ export default function ReportPage({ go }) {
           citation: f.legal_citation,
           evidence: f.ngo_evidence,
           reasoning: f.reasoning,
+          officerNotes: f.officer_notes || null,
           fix: f.status === "FAIL" ? "Submit the missing files to satisfy the relevant statutory requirement." : null,
           reviewedAt: f.reviewed_at ? new Date(f.reviewed_at).toLocaleString() : ""
         }));
@@ -72,15 +93,26 @@ export default function ReportPage({ go }) {
 
   const auto = findingsState.filter((finding) => finding.route === "auto");
   const human = findingsState.filter((finding) => finding.route === "human");
-  
-  const pass = findingsState.filter((finding) => finding.status === "PASS").length;
-  const fail = findingsState.filter((finding) => finding.status === "FAIL").length;
-  const uncertain = findingsState.filter((finding) => finding.status === "UNCERTAIN").length;
-  const overallScore = loading ? 74 : Math.round((pass / (findingsState.length || 7)) * 100);
+
+  // Derive effective status per finding: officer determination overrides AI status
+  const effectiveStatus = (f) => {
+    if (f.route === "human" && f.qStatus === "reviewed" && f.determination)
+      return f.determination;
+    return f.status;
+  };
+
+  // Prefer backend-computed counts (which include weights + officer overrides)
+  // Fall back to simple counts only if report endpoint was not available
+  const pass      = reportScore != null ? reportCounts.pass      : findingsState.filter((f) => effectiveStatus(f) === "PASS").length;
+  const fail      = reportScore != null ? reportCounts.fail      : findingsState.filter((f) => effectiveStatus(f) === "FAIL").length;
+  const uncertain = reportScore != null ? reportCounts.uncertain : findingsState.filter((f) => effectiveStatus(f) === "UNCERTAIN").length;
+  // Use backend score (weighted, officer-adjusted); fall back only to simple ratio when unavailable
+  const overallScore = loading ? 74 : reportScore != null ? reportScore : Math.round((pass / (findingsState.length || 7)) * 100);
 
   const statusRow = findingsState.map((f) => {
+    const eff = effectiveStatus(f);
     const displayStatus = f.qStatus === "reviewed" ? `${f.determination} (Officer)` : f.status;
-    const color = f.status === "PASS" || f.determination === "PASS" ? THEME.GR : f.status === "FAIL" ? THEME.RD : THEME.AM;
+    const color = eff === "PASS" ? THEME.GR : eff === "FAIL" ? THEME.RD : THEME.AM;
     return [f.dim, displayStatus, color];
   });
 
@@ -183,22 +215,30 @@ export default function ReportPage({ go }) {
             <span style={{ fontSize: 12, color: THEME.MT }}>{human.length} findings · reviewed by designated compliance officers</span>
           </div>
           <div style={{ display: "grid", gap: 7 }}>
-            {human.map((finding) => (
-              <div key={finding.id} style={{ background: THEME.WH, borderRadius: 8, border: `1px solid ${THEME.BD}`, borderLeft: `4px solid ${finding.qStatus === "reviewed" ? THEME.GR : THEME.AM}`, padding: "12px 16px" }}>
-                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <Badge s={finding.qStatus === "reviewed" ? (finding.determination || "PASS") : finding.status} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, color: THEME.NV, fontSize: 13, marginBottom: 2 }}>{finding.dim}</div>
-                    <div style={{ fontSize: 11, color: THEME.MT, marginBottom: 6 }}>{finding.qStatus === "reviewed" ? `Reviewed by ${finding.officer} (${finding.role}) · ${finding.reviewedAt}` : `Pending review · ${finding.officer} (${finding.role})`}</div>
-                    {finding.qStatus === "reviewed" ? (
-                      <div style={{ background: "#ECFDF5", borderRadius: 6, padding: "7px 10px", fontSize: 12, color: THEME.TX }}>{finding.officerNotes}</div>
-                    ) : (
-                      <div style={{ background: "#FEF3C7", borderRadius: 6, padding: "7px 10px", fontSize: 12, color: THEME.AM }}>⟳ Awaiting officer determination. Report is provisional for this dimension.</div>
-                    )}
+            {human.map((finding) => {
+              const eff = effectiveStatus(finding);
+              const borderColor = eff === "PASS" ? THEME.GR : eff === "FAIL" ? THEME.RD : THEME.AM;
+              const boxBg      = eff === "PASS" ? "#ECFDF5" : eff === "FAIL" ? "#FEE2E2" : "#FEF3C7";
+              const boxColor   = eff === "PASS" ? THEME.GR  : eff === "FAIL" ? THEME.RD  : THEME.AM;
+              return (
+                <div key={finding.id} style={{ background: THEME.WH, borderRadius: 8, border: `1px solid ${THEME.BD}`, borderLeft: `4px solid ${borderColor}`, padding: "12px 16px" }}>
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <Badge s={finding.qStatus === "reviewed" ? (finding.determination || "UNCERTAIN") : finding.status} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: THEME.NV, fontSize: 13, marginBottom: 2 }}>{finding.dim}</div>
+                      <div style={{ fontSize: 11, color: THEME.MT, marginBottom: 6 }}>{finding.qStatus === "reviewed" ? `Reviewed by ${finding.officer} (${finding.role}) · ${finding.reviewedAt}` : `Pending review · ${finding.officer} (${finding.role})`}</div>
+                      {finding.qStatus === "reviewed" ? (
+                        <div style={{ background: boxBg, borderRadius: 6, padding: "7px 10px", fontSize: 12, color: boxColor }}>
+                          {finding.officerNotes || `Officer determination: ${finding.determination}`}
+                        </div>
+                      ) : (
+                        <div style={{ background: "#FEF3C7", borderRadius: 6, padding: "7px 10px", fontSize: 12, color: THEME.AM }}>⟳ Awaiting officer determination. Report is provisional for this dimension.</div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

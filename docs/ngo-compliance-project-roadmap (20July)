@@ -1,0 +1,129 @@
+# Project Roadmap: NGO Compliance Verification System
+## 3-Phase Productionization Plan
+
+This document outlines a structured, 3-phase engineering roadmap to transition the NGO Compliance Verification System from a prototype to a secure, high-performance, production-grade local application.
+
+---
+
+## PHASE 1: Prompt Calibration & Scoring Optimization
+**Objective:** Enhance the accuracy of compliance findings, prevent LLM hallucination/leakage, and align the scoring engine with legal reasoning.
+
+### 1.1 Multi-Dimension Consolidated Prompting
+- **Current State:** The system calls the LLM in a consolidated format to check all 7 active dimensions in one request to save API calls.
+- **Optimizations:**
+  - **XML-Based Isolation:** Use strict `<dimension id="...">` tags in the prompt to separate the retrieved legal provisions and NGO evidence for each category. This prevents reasoning leakage (e.g., preventing trust governance rules from bleeding into Section 8 audit requirements).
+  - **Structured JSON Schema Constraints:** Force the LLM to output a strict JSON schema containing a dictionary of results mapped by `dimension_id`. Use structured output parsing (e.g., Pydantic parsing with `instructor` or Gemini Structured Outputs) to ensure JSON parsing never fails.
+  - **Self-Correction & Refinement Prompting:** Instruct the model to perform a sanity check: *Does the legal citation in my output exist verbatim in the provided legal context?* If not, output `UNCERTAIN` and set confidence below `0.5`.
+
+### 1.2 Evidence-Disciplined Assessment Rules
+- **Explicit Missing Evidence Handling:** Define strict operational mappings for the LLM:
+  - **PASS:** Evidence is present, validated, and matches/exceeds statutory requirements.
+  - **FAIL:** Evidence directly contradicts statutory requirements OR an active cross-document consistency issue is detected (e.g., PAN mismatch).
+  - **UNCERTAIN:** Critical evidence fields are missing, unreadable (poor OCR), or ambiguous. **The LLM must never assume compliance from a lack of data.**
+  - **CORPUS_GAP:** Handled programmatically when RAG returns zero legal chunks for a query.
+
+### 1.3 Weighted Scoring Engine Calibration
+- **Autoritative Scoring Engine:** Implement `calculate_score` globally in `backend/services/scoring.py`.
+- **Confidence-Adjusted Formulas:**
+  - For `PASS`/`FAIL`: $\text{Score} = \text{Base} \times \text{Confidence} + 0.5 \times (1 - \text{Confidence})$.
+  - For `UNCERTAIN`/`CORPUS_GAP`: $\text{Score} = 0.5$ (neutral contribution).
+- **Post-Review Recomputations:** Ensure that any human officer override (e.g., changing a dimension from `UNCERTAIN` to `PASS`) triggers a real-time recalculation of the `overall_score` and report counts in the backend reports endpoint (`/submissions/{id}/report`).
+
+---
+
+## PHASE 2: Transitioning to Local LLMs (Security & Privacy)
+**Objective:** Meet NITI Aayog/NIC data privacy requirements by hosting all embeddings and inference locally, keeping sensitive NGO affidavits on-premise.
+
+```mermaid
+graph TD
+    A[NGO Uploaded Document] --> B[OCR & Text Extraction]
+    B --> C[Merged Fields JSON]
+    C --> D[ChromaDB Local Vector DB]
+    D -->|RAG Legal Context| E[Ollama Client / local server]
+    E -->|Mistral 7B / Llama 3| F[Structured Assessment Finding]
+    F --> G[Compliance Database]
+```
+
+### 2.1 Local LLM Stack Recommendation
+We recommend using **Ollama** or **vLLM** hosted on local server infrastructure.
+- **Primary LLM Model:** `Mistral-7B-Instruct-v0.3` or `Llama-3-8B-Instruct`. Both have strong performance on structured JSON output, citation adherence, and localized context reasoning.
+- **Primary Embedding Model:** `nomic-embed-text` (768 dimensions, 8k context length) via Ollama. It excels at semantic search on statutory provisions.
+
+### 2.2 LLM Latency & Throughput Optimizations (Bonus)
+Since local LLMs have lower throughput than cloud APIs, we must implement optimizations to prevent the assessment pipeline from timing out:
+
+1. **Grouped Multi-Dimension Call (Single Inference Pass):**
+   - Instead of running 7 separate sequential LLM requests (which takes ~35–50 seconds on localized consumer GPUs), compile all legal context and evidence into a single prompt.
+   - This reduces inference overhead to a single context pre-fill (Prompt Processing) phase, lowering total assessment time to **~8–15 seconds total**.
+
+2. **vLLM with Context/Prompt Caching:**
+   - **How it works:** The legal provisions (retrieved from state Acts) and system instructions represent **~80-90% of the prompt token count**.
+   - By using a serving engine like **vLLM** or **llama.cpp** with **Prompt Caching** (K-V Caching) enabled, the system caches the legal codes in GPU memory. The model only processes the net-new NGO evidence tokens for subsequent assessments, reducing first-token latency by up to **70%**.
+
+3. **Model Quantization (4-bit / 8-bit GGUF or AWQ):**
+   - Deploying models in 4-bit (e.g., `Q4_K_M` GGUF) or 8-bit formats reduces model memory footprint (allowing a 8B model to run comfortably on a single local GPU with <8GB VRAM) and speeds up generation tokens-per-second by **2x to 3x** with negligible accuracy loss.
+
+4. **Background Task Queue (Asynchronous Pipeline):**
+   - Offload the OCR + RAG + LLM pipeline from the API thread to an asynchronous worker queue (e.g., Python's `BackgroundTasks` or `Celery` with Redis).
+   - The user receives an instant `202 Accepted` response, and the frontend polls `/submissions/{id}/status` to display a step-by-step progress bar while local inference executes.
+
+---
+
+## PHASE 3: Relational Database Integration
+**Objective:** Replace the transient in-memory / JSON-based store with a persistent, audit-ready database.
+
+### 3.1 Recommended Database: PostgreSQL
+**Why PostgreSQL is the best fit:**
+- **Hybrid Schema Capability:** The extraction pipeline extracts different fields depending on the uploaded document type (e.g., Trust Deeds contain `quorum`, while Audit Reports contain `auditor_icai`). PostgreSQL's **JSONB** column type is perfect for storing these dynamic, semi-structured field dictionaries while allowing indexes (`GIN index`) and JSON-path queries directly inside SQL.
+- **Relational Integrity for Human Overrides:** The audit trail requires strict relationships between `submissions`, `compliance_findings`, and the `human_review_queue`.
+- **ACID Compliance:** Essential for government reporting, ensuring compliance logs are immutable and traceable.
+
+### 3.2 SQLAlchemy ORM Model Mapping
+Create database models under `backend/models/orm.py` using **SQLAlchemy** to represent the 8 core tables:
+
+```python
+from sqlalchemy import Column, String, Float, Boolean, DateTime, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.orm import relationship
+import uuid
+
+# Example ORM Definition for Extracted Fields and Findings
+class Submission(Base):
+    __tablename__ = "submissions"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    org_name = Column(String, nullable=False)
+    state = Column(String, nullable=False)
+    entity_type = Column(String, nullable=False)
+    pan = Column(String, nullable=False)
+    status = Column(String, default="pending")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ExtractedField(Base):
+    __tablename__ = "extracted_fields"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    submission_id = Column(UUID(as_uuid=True), ForeignKey("submissions.id"), nullable=False)
+    # JSONB is crucial here to capture variable document attributes
+    merged_fields = Column(JSONB, nullable=False) 
+    extraction_log = Column(JSONB)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ComplianceFinding(Base):
+    __tablename__ = "compliance_findings"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    submission_id = Column(UUID(as_uuid=True), ForeignKey("submissions.id"), nullable=False)
+    dimension_id = Column(String, nullable=False)
+    status = Column(String, nullable=False) # PASS, FAIL, UNCERTAIN, CORPUS_GAP
+    confidence = Column(Float, nullable=False)
+    legal_citation = Column(String)
+    ngo_evidence = Column(String)
+    reasoning = Column(String)
+    routing = Column(String) # auto_report, human_review, corpus_alert
+    citation_valid = Column(Boolean, default=True)
+    raw_llm_output = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+```
+
+### 3.3 Data Flow Migration Strategy
+1. **Model Instantiation:** Define ORM classes matching the JSON specifications in `backend/store.py`.
+2. **Repository Layer Pattern:** Write repository queries in `backend/store.py` (e.g., `get_submission`, `get_findings_for_submission`) to fetch from DB sessions rather than the in-memory dictionaries. This minimizes code modifications in routers.
+3. **Database Migrations (Alembic):** Use `Alembic` to track database changes and seeds (e.g., seeding the `compliance_dimensions` static metadata tables).

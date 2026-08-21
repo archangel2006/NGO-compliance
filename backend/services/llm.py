@@ -1,13 +1,20 @@
 import json
 import re
-import ollama
 from typing import Optional
 from dotenv import load_dotenv
 import os
+import ollama
+from ollama import Client
+
 
 load_dotenv()
 
-LLM_MODEL   = os.getenv("LLM_MODEL", "mistral")
+# Instantiate Ollama Client using base url config
+client = Client(host=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))
+
+LLM_MODEL = os.getenv("LLM_MODEL", "mistral")
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
+
 TEMPERATURE = 0.1   # low temp — legal reasoning needs consistency
 
 
@@ -15,26 +22,27 @@ TEMPERATURE = 0.1   # low temp — legal reasoning needs consistency
 
 def generate(prompt: str, system: Optional[str] = None,
              expect_json: bool = True) -> str:
-    """
-    Raw LLM call. Returns string response.
-    All other functions in this module call this.
-    """
-    messages = []
+
+    full_prompt = ""
     if system:
-        messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": prompt})
+        full_prompt += system + "\n\n"
+    full_prompt += prompt
 
-    response = ollama.chat(
-        model=LLM_MODEL,
-        messages=messages,
-        options={
-            "temperature": TEMPERATURE,
-            "num_predict": 1024,   # cap output length — compliance answers are short
-        },
-        format="json" if expect_json else "",
-    )
-    return response["message"]["content"]
-
+    print(f"[LLM] Calling Ollama ({LLM_MODEL}) (prompt={len(full_prompt)} chars)...")
+    try:
+        response = client.generate(
+            model=LLM_MODEL,
+            prompt=full_prompt,
+            options={
+                "temperature": TEMPERATURE,
+                "num_ctx": OLLAMA_NUM_CTX
+            }
+        )
+        print(f"[LLM] Successfully generated using local Ollama model {LLM_MODEL}")
+        return response["response"]
+    except Exception as e:
+        print(f"[LLM] Ollama model {LLM_MODEL} failed: {e}")
+        raise e
 
 # ── JSON parsing (handles common LLM output failures) ────────────
 
@@ -155,17 +163,28 @@ legal provisions. Return ONLY a JSON array of strings:
 
 # ── Quick health check ────────────────────────────────────────────
 
-def check_llm_available() -> dict:
-    """Test Ollama is running and model is loaded."""
+def check_llm_available():
+    """Check Ollama connectivity and model loading."""
+
     try:
-        response = ollama.chat(
+        response = client.generate(
             model=LLM_MODEL,
-            messages=[{"role": "user",
-                       "content": 'Reply with {"status":"ok"}'}],
-            options={"temperature": 0, "num_predict": 20},
-            format="json",
+            prompt='Reply only with {"status":"ok"}',
+            options={
+                "temperature": 0.1,
+                "num_ctx": OLLAMA_NUM_CTX
+            }
         )
-        return {"available": True, "model": LLM_MODEL,
-                "response": response["message"]["content"]}
+
+        return {
+            "available": True,
+            "model": LLM_MODEL,
+            "response": response["response"]
+        }
+
     except Exception as e:
-        return {"available": False, "model": LLM_MODEL, "error": str(e)}
+        return {
+            "available": False,
+            "model": LLM_MODEL,
+            "error": str(e)
+        }

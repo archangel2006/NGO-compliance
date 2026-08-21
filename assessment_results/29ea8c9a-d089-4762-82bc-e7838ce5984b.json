@@ -1,0 +1,177 @@
+{
+  "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+  "findings": [
+    {
+      "id": "14020724-b808-46e6-a6c6-aba2b53a9e8a",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "UNCERTAIN",
+      "confidence": 0.575,
+      "legal_citation": "None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)",
+      "ngo_evidence": "act_registered_under: the Registration Act, 1908",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    },
+    {
+      "id": "7c3cd7c8-65a5-44d5-9142-fe83138598e1",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "UNCERTAIN",
+      "confidence": 0.575,
+      "legal_citation": "None applicable (retrieved provisions are for Societies Registration Act)",
+      "ngo_evidence": "trustee_count: 8",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    },
+    {
+      "id": "c1228a83-1dbb-452c-9b9b-4ffad5be56b1",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "None applicable (retrieved provisions are for Societies Registration Act)",
+      "ngo_evidence": "trustee_count: 8",
+      "reasoning": "The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    },
+    {
+      "id": "e9c00443-88cb-4c17-bcf1-a1d186e8684b",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G",
+      "ngo_evidence": "total_receipts: 3477000, total_expenditure: 1995000",
+      "reasoning": "The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    },
+    {
+      "id": "6a4a551f-1539-4258-8044-c1e3d7e7783e",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "PASS",
+      "confidence": 0.9,
+      "legal_citation": "Income Tax Act, 1961",
+      "ngo_evidence": "cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027",
+      "reasoning": "The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.",
+      "routing": "auto_report",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    },
+    {
+      "id": "c9cffaa0-6dec-4d58-8386-5bd213ef679f",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Foreign Contribution (Regulation) Act, 2010, Section 17",
+      "ngo_evidence": "fcra_reg_number: 231560442, valid_until: 31/03/2027",
+      "reasoning": "While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    },
+    {
+      "id": "0678a268-4d49-4815-aaf8-cdb0659e2c1c",
+      "submission_id": "29ea8c9a-d089-4762-82bc-e7838ce5984b",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Income Tax Rules, Rule 114H",
+      "ngo_evidence": "auditor_icai: 026871, audit_period: 31 March 2024",
+      "reasoning": "The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Registration under the relevant trust law or Registration Act, 1908 in Delhi\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act in Uttarakhand, Haryana, and Odisha)\",\n    \"ngo_evidence\": \"act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The retrieved legal provisions pertain to the Societies Registration Act amendments in Uttarakhand, Haryana, and Odisha, which do not apply to a Public Trust registered in Delhi under the Registration Act, 1908.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Governance requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions govern societies under the Societies Registration Act (including Haryana amendments) and do not apply to a Public Trust in Delhi.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Membership/Trustee requirements for a Public Trust\",\n    \"legal_citation\": \"None applicable (retrieved provisions are for Societies Registration Act)\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The retrieved legal provisions are from the Societies Registration Act, 1860, which is inapplicable to a Public Trust in Delhi.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Compliance with donation modes under Section 80G or FATCA/CRS reporting under Income Tax Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rules 114F, 114G, and 114H / Income Tax Act, Section 80G\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence provides total receipts and expenditures but lacks details regarding donation modes or FATCA/CRS registration, making compliance verification impossible.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"matched_requirement\": \"Valid registration under Section 12A and Section 80G of the Income Tax Act, 1961\",\n    \"legal_citation\": \"Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G certifications active until 31/03/2027, satisfying the tax exemption registration requirements under the Income Tax Act, 1961.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Receipt of foreign contribution only in a designated FCRA Account at SBI New Delhi under Section 17\",\n    \"legal_citation\": \"Foreign Contribution (Regulation) Act, 2010, Section 17\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442, valid_until: 31/03/2027\",\n    \"reasoning\": \"While the trust has a valid FCRA registration, the evidence lacks details about the designated SBI New Delhi bank account required under Section 17.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"matched_requirement\": \"Audit of IT framework and compliance under FATCA/CRS Rules\",\n    \"legal_citation\": \"Income Tax Rules, Rule 114H\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence confirms a general financial audit was conducted by a registered auditor, but contains no information regarding the specific FATCA/CRS IT framework audit required by the provision.\"\n  }\n}",
+      "created_at": "2026-08-06T12:17:56.802443"
+    }
+  ],
+  "score": {
+    "overall_score": 57,
+    "label": "Partial Compliance \u2014 Significant Gaps",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "UNCERTAIN",
+        "confidence": 0.57,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "UNCERTAIN",
+        "confidence": 0.57,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "PASS",
+        "confidence": 0.9,
+        "adjusted_score": 0.95,
+        "weight": 0.15,
+        "contribution": 0.142
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      }
+    },
+    "pass_count": 1,
+    "fail_count": 0,
+    "uncertain_count": 6,
+    "corpus_gap_count": 0
+  }
+}

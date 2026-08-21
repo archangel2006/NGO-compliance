@@ -1,0 +1,177 @@
+{
+  "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+  "findings": [
+    {
+      "id": "d2ec1856-17b9-4c6d-976a-c9eb8e5659e9",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "FAIL",
+      "confidence": 0.235,
+      "legal_citation": "",
+      "ngo_evidence": "- registration_number: DL/2015/00874\n- registering_authority: OF ASSURANCES\n- act_registered_under: the Registration Act, 1908\n- date_of_registration: 11/02/2015",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    },
+    {
+      "id": "187ce060-8a7d-4824-8a57-634c276fef7e",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "FAIL",
+      "confidence": 0.235,
+      "legal_citation": "",
+      "ngo_evidence": "- trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\nSection 5']\n- trustee_count: 8\n- quorum: The quorum for a meeting of the Board of Trustees shall be tw\n- non_profit_clause_present: True\n- dissolution_clause_present: True",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    },
+    {
+      "id": "82d88af8-81cb-4585-8a44-061796402587",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "FAIL",
+      "confidence": 0.1,
+      "legal_citation": "",
+      "ngo_evidence": "- trustee_count: 8\n- trustee_names: ['Vinod Malhotra', 'Lal Malhotra', 'Renu Kapoor', 'Prem Nath Kapoor', 'Ashok Bhatia', 'Ram Lal Bhatia', 'Vasant Vihar', 'Ashok Bhatia\\nSection 5']",
+      "reasoning": "Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    },
+    {
+      "id": "1aebcef9-ed68-4c11-a186-294d2f94863f",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "FAIL",
+      "confidence": 0.1,
+      "legal_citation": "",
+      "ngo_evidence": "- financial_year: 2023-24\n- total_receipts: 3477000\n- total_expenditure: 1995000",
+      "reasoning": "Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    },
+    {
+      "id": "a1978416-cb0b-421f-a395-4245e8252a03",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "FAIL",
+      "confidence": 0.1,
+      "legal_citation": "",
+      "ngo_evidence": "- cert_12a_number: IT-12AB-DEL-2022-8814\n- cert_80g_number: IT-80G-DEL-2022-9127\n- valid_from: 01/04/2022\n- valid_until: 31/03/2027\n- pan: AAATU4482D",
+      "reasoning": "Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    },
+    {
+      "id": "82ee73b8-28d8-47c0-9e6e-639112b3dc6c",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "FAIL",
+      "confidence": 0.1,
+      "legal_citation": "",
+      "ngo_evidence": "- fcra_reg_number: 231560442\n- valid_until: 31/03/2027",
+      "reasoning": "Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    },
+    {
+      "id": "43cdf849-a739-4cc9-b949-5631665386eb",
+      "submission_id": "867a7c50-2a7a-423f-b530-deadc6933952",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "FAIL",
+      "confidence": 0.1,
+      "legal_citation": "",
+      "ngo_evidence": "- auditor_icai: 026871\n- audit_period: 31 March 2024",
+      "reasoning": "Combined LLM response could not be parsed for this dimension.",
+      "routing": "auto_report",
+      "citation_valid": false,
+      "raw_llm_output": " Based on the provided data, here are the evaluations for each dimension:\n\n1. Registration\n   - matched_requirement: Valid registration certificate under FCRA Act\n   - legal_citation: fcra_reg_number, valid_until\n   - ngo_evidence: fcra_reg_number: 231560442, valid_until: 31/03/2027\n   - reasoning: The NGO has a valid FCRA registration number and the registration is valid until March 31, 2027.\n\n2. Governance\n   - matched_requirement: Compliance with provisions related to appointment of trustees or directors\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding governance is provided, and there is no evidence to determine compliance.\n\n3. Membership\n   - matched_requirement: Compliance with provisions related to membership criteria\n   - legal_citation: Not provided in the data\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific provision regarding membership is provided, and there is no evidence to determine compliance.\n\n4. Financial\n   - matched_requirement: Compliance with provisions related to maintenance of accounts and annual audit\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: auditor_icai: 026871, audit_period: 31 March 2024\n   - reasoning: The NGO has an ICAI auditor and is due for audit by March 31, 2024, indicating compliance with the financial reporting requirements under Income Tax Rules.\n\n5. Tax\n   - matched_requirement: Compliance with provisions related to tax filings under FATCA and CRS\n   - legal_citation: Foreign Account Tax Compliance Act (FATCA) and Common Reporting Standards (CRS), Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: No specific evidence is provided to determine compliance with tax filings under FATCA and CRS.\n\n6. FCRA\n   - matched_requirement: Compliance with provisions related to maintenance of FCRA accounts\n   - legal_citation: Section 17 of the principal Act, as amended\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to maintain FCRA accounts as per section 17 of the principal Act, but no specific evidence is provided to determine compliance.\n\n7. Audit\n   - matched_requirement: Compliance with audit requirements under FATCA and CRS\n   - legal_citation: Income Tax Rules 114F, 114G, and 114H\n   - ngo_evidence: Not provided in the data (assumed UNCERTAIN due to lack of evidence)\n   - reasoning: The NGO is required to comply with audit requirements under FATCA and CRS as per Income Tax Rules, but no specific evidence is provided to determine compliance.",
+      "created_at": "2026-08-06T13:14:31.907990"
+    }
+  ],
+  "score": {
+    "overall_score": 43,
+    "label": "Non-Compliant \u2014 Major Action Required",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "FAIL",
+        "confidence": 0.23,
+        "adjusted_score": 0.38,
+        "weight": 0.2,
+        "contribution": 0.077
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "FAIL",
+        "confidence": 0.23,
+        "adjusted_score": 0.38,
+        "weight": 0.15,
+        "contribution": 0.057
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "FAIL",
+        "confidence": 0.1,
+        "adjusted_score": 0.45,
+        "weight": 0.1,
+        "contribution": 0.045
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "FAIL",
+        "confidence": 0.1,
+        "adjusted_score": 0.45,
+        "weight": 0.2,
+        "contribution": 0.09
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "FAIL",
+        "confidence": 0.1,
+        "adjusted_score": 0.45,
+        "weight": 0.15,
+        "contribution": 0.068
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "FAIL",
+        "confidence": 0.1,
+        "adjusted_score": 0.45,
+        "weight": 0.1,
+        "contribution": 0.045
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "FAIL",
+        "confidence": 0.1,
+        "adjusted_score": 0.45,
+        "weight": 0.1,
+        "contribution": 0.045
+      }
+    },
+    "pass_count": 0,
+    "fail_count": 7,
+    "uncertain_count": 0,
+    "corpus_gap_count": 0
+  }
+}

@@ -7,9 +7,56 @@ from backend.auth import get_current_user
 from backend.store import (SUBMISSIONS, FINDINGS, QUEUE, REPORTS,
                             get_submission, get_findings_for_submission,
                             get_queue_for_submission, new_id, now)
+from backend.services.scoring import calculate_score, score_label, DIMENSION_WEIGHTS, STATUS_BASE_SCORES
 
 REPORTS_DIR = Path(os.getenv("REPORTS_DIR", "reports"))
 router      = APIRouter()
+
+
+class _FindingProxy:
+    """Lightweight proxy so we can pass findings dicts into calculate_score."""
+    __slots__ = ["dimension_id", "dimension_name", "status", "confidence"]
+
+    def __init__(self, dimension_id: str, dimension_name: str,
+                 status: str, confidence: float):
+        self.dimension_id   = dimension_id
+        self.dimension_name = dimension_name
+        self.status         = status
+        self.confidence     = confidence
+
+
+def _effective_findings_for_score(findings: list, queue_map: dict) -> list:
+    """
+    Build a list of _FindingProxy objects that reflect the FINAL effective
+    status for every dimension, incorporating officer_determination overrides.
+
+    Rules:
+    - If a finding was routed to human_review and the officer has submitted a
+      determination (PASS / FAIL), use that determination as the effective status.
+    - All other findings keep their AI status.
+    - Confidence for a human-overridden finding is set to 0.90 (officer is
+      authoritative — treat as high-confidence determination).
+    """
+    proxies = []
+    for f in findings:
+        dim_id   = f.get("dimension_id", "")
+        dim_name = f.get("dimension_name", "")
+        status   = f.get("status", "UNCERTAIN")
+        conf     = f.get("confidence", 0.5)
+
+        # Apply officer override
+        q = queue_map.get(f["id"])
+        if q and q.get("officer_determination") in ("PASS", "FAIL"):
+            status = q["officer_determination"]
+            conf   = 0.90  # officer determination is authoritative
+
+        proxies.append(_FindingProxy(
+            dimension_id   = dim_id,
+            dimension_name = dim_name,
+            status         = status,
+            confidence     = conf,
+        ))
+    return proxies
 
 
 def _build_report(submission_id: str) -> dict:
@@ -17,7 +64,6 @@ def _build_report(submission_id: str) -> dict:
     sub      = get_submission(submission_id)
     findings = get_findings_for_submission(submission_id)
     queue    = get_queue_for_submission(submission_id)
-    score    = sub.get("score", {})
 
     # Split findings into auto-assessed vs human-reviewed
     auto_findings  = [f for f in findings if f["routing"] == "auto_report"]
@@ -34,15 +80,19 @@ def _build_report(submission_id: str) -> dict:
             f["reviewed_at"]           = q.get("reviewed_at")
             f["queue_status"]          = q.get("queue_status")
 
+    # --- Recompute score using FINAL effective statuses (with officer overrides) ---
+    effective = _effective_findings_for_score(findings, queue_map)
+    score     = calculate_score(effective)
+
     return {
-        "submission":   sub,
-        "overall_score":  score.get("overall_score"),
-        "score_label":    score.get("label"),
-        "grant_ready":    score.get("grant_ready"),
-        "score_breakdown":score.get("breakdown", {}),
-        "pass_count":     score.get("pass_count"),
-        "fail_count":     score.get("fail_count"),
-        "uncertain_count":score.get("uncertain_count"),
+        "submission":      sub,
+        "overall_score":   score["overall_score"],
+        "score_label":     score["label"],
+        "grant_ready":     score["grant_ready"],
+        "score_breakdown": score["breakdown"],
+        "pass_count":      score["pass_count"],
+        "fail_count":      score["fail_count"],
+        "uncertain_count": score["uncertain_count"],
         "auto_findings":   auto_findings,
         "human_findings":  human_findings,
         "pending_queue":   sum(1 for q in queue if q["queue_status"] != "reviewed"),

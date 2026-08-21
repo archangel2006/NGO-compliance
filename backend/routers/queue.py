@@ -10,7 +10,16 @@ router = APIRouter()
 @router.get("")
 def get_queue(user: dict = Depends(require_officer)):
     """All pending and in-review queue items."""
-    items = list(QUEUE.values())
+    items = []
+    for item in QUEUE.values():
+        finding = FINDINGS.get(item["finding_id"], {})
+        items.append({
+            **item,
+            "confidence": finding.get("confidence", 0.50),
+            "legal_citation": finding.get("legal_citation", ""),
+            "ngo_evidence": finding.get("ngo_evidence", ""),
+            "status": finding.get("status", "UNCERTAIN"),
+        })
     items.sort(key=lambda x: x["created_at"])
     return {
         "total":   len(items),

@@ -19,17 +19,17 @@ export default function QueuePage({ go }) {
         id: item.id,
         finding_id: item.finding_id,
         dim: item.dimension_name,
-        status: "UNCERTAIN", // base AI status that triggered queue routing
+        status: item.status || "UNCERTAIN",
         route: "human",
-        conf: 0.64,
+        conf: item.confidence ?? 0.64,
         qStatus: item.queue_status, // "pending" | "reviewed"
         officer: "Officer Ramesh K.",
         role: "Sr. Compliance Officer",
         determination: item.officer_determination,
         reviewedAt: item.reviewed_at ? new Date(item.reviewed_at).toLocaleDateString() : "",
         officerNotes: item.officer_notes,
-        evidence: "NGO details and uploaded PDF evidence are being evaluated.",
-        citation: "Under review by NITI Darpan compliance verification framework.",
+        evidence: item.ngo_evidence || "NGO details and uploaded PDF evidence are being evaluated.",
+        citation: item.legal_citation || "Under review by NITI Darpan compliance verification framework.",
       }));
       setQueueItems(mapped);
     } catch (err) {
@@ -126,12 +126,19 @@ export default function QueuePage({ go }) {
               </div>
 
               {finding.qStatus === "reviewed" ? (
-                <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: 7, padding: 12 }}>
+                <div style={{
+                  background: finding.determination === "PASS" ? "#ECFDF5" : "#FEE2E2",
+                  border: `1px solid ${finding.determination === "PASS" ? "#A7F3D0" : "#FCA5A5"}`,
+                  borderRadius: 7,
+                  padding: 12
+                }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: THEME.GR }}>OFFICER DETERMINATION: {finding.determination}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: finding.determination === "PASS" ? THEME.GR : THEME.RD }}>
+                      OFFICER DETERMINATION: {finding.determination}
+                    </div>
                     <span style={{ fontSize: 10, color: THEME.MT }}>{finding.reviewedAt}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: THEME.TX, lineHeight: 1.6 }}>{finding.officerNotes}</div>
+                  <div style={{ fontSize: 12, color: THEME.TX, lineHeight: 1.6 }}>{finding.officerNotes || "No notes provided."}</div>
                   <div style={{ fontSize: 10, color: THEME.MT, marginTop: 5 }}>Reviewed by {finding.officer} · {finding.role} · Audit trail logged</div>
                 </div>
               ) : (

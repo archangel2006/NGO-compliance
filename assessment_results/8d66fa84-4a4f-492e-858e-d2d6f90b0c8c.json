@@ -1,0 +1,177 @@
+{
+  "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+  "findings": [
+    {
+      "id": "b3f205a8-c645-4974-a1be-84b6cfce8601",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "registration",
+      "dimension_name": "Registration & Legal Status",
+      "status": "UNCERTAIN",
+      "confidence": 0.575,
+      "legal_citation": "Registration Act, 1908",
+      "ngo_evidence": "registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] [Citation unverified] The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    },
+    {
+      "id": "c2cd589a-acab-4354-b920-d7e59f1b484c",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "governance",
+      "dimension_name": "Governance Structure",
+      "status": "UNCERTAIN",
+      "confidence": 0.575,
+      "legal_citation": "Section 16 of the Societies Registration Act, 1860",
+      "ngo_evidence": "quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]",
+      "reasoning": "[Verified in: Trust Deed, Registration Certificate, 12A Certificate, 80G Certificate, FCRA Certificate, Annual Report, Audit Report, PAN] The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    },
+    {
+      "id": "b784c543-d0c4-4e4d-89cd-89b85d6e0583",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "membership",
+      "dimension_name": "Membership Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Section 3 of the Societies Registration Act, 1860",
+      "ngo_evidence": "trustee_count: 8",
+      "reasoning": "The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    },
+    {
+      "id": "6da9b541-8e1a-4dd4-816d-2777633e5794",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "financial",
+      "dimension_name": "Financial Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Section 80G of the Income Tax Act, 1961",
+      "ngo_evidence": "total_receipts: 3477000, total_expenditure: 1995000",
+      "reasoning": "The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.",
+      "routing": "human_review",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    },
+    {
+      "id": "0cd27852-cd26-4584-9425-db24b17e79ad",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "tax",
+      "dimension_name": "Tax Compliance (12A/80G)",
+      "status": "PASS",
+      "confidence": 0.9,
+      "legal_citation": "Chapter XII-EB of the Income Tax Act, 1961",
+      "ngo_evidence": "cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027",
+      "reasoning": "The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.",
+      "routing": "auto_report",
+      "citation_valid": true,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    },
+    {
+      "id": "de0bdb8b-7663-4392-931a-4c27c5ae764d",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "fcra",
+      "dimension_name": "FCRA Compliance",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Income Tax Rules 114F, 114G and 114H",
+      "ngo_evidence": "fcra_reg_number: 231560442",
+      "reasoning": "The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    },
+    {
+      "id": "28c63260-59e0-441f-a4cd-a54c942a4e83",
+      "submission_id": "8d66fa84-4a4f-492e-858e-d2d6f90b0c8c",
+      "dimension_id": "audit",
+      "dimension_name": "Audit Requirements",
+      "status": "UNCERTAIN",
+      "confidence": 0.5,
+      "legal_citation": "Section 12(1A) of the Foreign Contribution (Regulation) Act",
+      "ngo_evidence": "auditor_icai: 026871, audit_period: 31 March 2024",
+      "reasoning": "The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.",
+      "routing": "human_review",
+      "citation_valid": false,
+      "raw_llm_output": "{\n  \"registration\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Registration Act, 1908\",\n    \"ngo_evidence\": \"registration_number: DL/2015/00874, act_registered_under: the Registration Act, 1908\",\n    \"reasoning\": \"The trust is registered in Delhi under the Registration Act, 1908 with the Office of Assurances, which is the standard registration authority for Delhi-based public trusts.\"\n  },\n  \"governance\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 16 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"quorum: 'The', trustee_names: ['Vinod Malhotra', ..., 'Vasant Vihar', ...]\",\n    \"reasoning\": \"The quorum value is incomplete ('The') and the trustee list contains non-individual entries like 'Vasant Vihar', making the governance structure details ambiguous.\"\n  },\n  \"membership\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 3 of the Societies Registration Act, 1860\",\n    \"ngo_evidence\": \"trustee_count: 8\",\n    \"reasoning\": \"The evidence only lists trustees and lacks any information regarding membership rules, fees, or compliance with the registration requirements specified in the legal provision.\"\n  },\n  \"financial\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 80G of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"total_receipts: 3477000, total_expenditure: 1995000\",\n    \"reasoning\": \"The evidence only provides aggregate financial figures and lacks details on the modes of donations received, making it impossible to verify compliance with the Rs 2,000 cash donation limit.\"\n  },\n  \"tax\": {\n    \"status\": \"PASS\",\n    \"legal_citation\": \"Chapter XII-EB of the Income Tax Act, 1961\",\n    \"ngo_evidence\": \"cert_12a_number: IT-12AB-DEL-2022-8814, cert_80g_number: IT-80G-DEL-2022-9127, valid_until: 31/03/2027\",\n    \"reasoning\": \"The trust holds valid 12A and 80G registrations valid until 31/03/2027, demonstrating active tax-exempt status compliance.\"\n  },\n  \"fcra\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Income Tax Rules 114F, 114G and 114H\",\n    \"ngo_evidence\": \"fcra_reg_number: 231560442\",\n    \"reasoning\": \"The provided evidence only contains FCRA registration details and lacks any information regarding FATCA/CRS registration or reporting compliance as required by the legal provision.\"\n  },\n  \"audit\": {\n    \"status\": \"UNCERTAIN\",\n    \"legal_citation\": \"Section 12(1A) of the Foreign Contribution (Regulation) Act\",\n    \"ngo_evidence\": \"auditor_icai: 026871, audit_period: 31 March 2024\",\n    \"reasoning\": \"The evidence only provides auditor details and the audit period, with no information regarding the opening or maintenance of the mandatory FCRA Account.\"\n  }\n}",
+      "created_at": "2026-08-04T07:56:43.028070"
+    }
+  ],
+  "score": {
+    "overall_score": 57,
+    "label": "Partial Compliance \u2014 Significant Gaps",
+    "grant_ready": false,
+    "breakdown": {
+      "registration": {
+        "name": "Registration & Legal Status",
+        "status": "UNCERTAIN",
+        "confidence": 0.57,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "governance": {
+        "name": "Governance Structure",
+        "status": "UNCERTAIN",
+        "confidence": 0.57,
+        "adjusted_score": 0.5,
+        "weight": 0.15,
+        "contribution": 0.075
+      },
+      "membership": {
+        "name": "Membership Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "financial": {
+        "name": "Financial Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.2,
+        "contribution": 0.1
+      },
+      "tax": {
+        "name": "Tax Compliance (12A/80G)",
+        "status": "PASS",
+        "confidence": 0.9,
+        "adjusted_score": 0.95,
+        "weight": 0.15,
+        "contribution": 0.142
+      },
+      "fcra": {
+        "name": "FCRA Compliance",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      "audit": {
+        "name": "Audit Requirements",
+        "status": "UNCERTAIN",
+        "confidence": 0.5,
+        "adjusted_score": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      }
+    },
+    "pass_count": 1,
+    "fail_count": 0,
+    "uncertain_count": 6,
+    "corpus_gap_count": 0
+  }
+}

@@ -1,12 +1,17 @@
 # backend/main.py
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Must run before any module that reads DATABASE_URL
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from backend.models.database import engine, Base
+import backend.models.orm  # Registers all ORM mappings with Base
+
+Base.metadata.create_all(bind=engine)  # Creates tables if they don't exist
 
 # Import all routers
 from backend.routers import (

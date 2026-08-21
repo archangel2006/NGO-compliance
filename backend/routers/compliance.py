@@ -6,10 +6,10 @@ from backend.auth import get_current_user
 from backend.store import (
     SUBMISSIONS, DOCUMENTS, EXTRACTED, FINDINGS, QUEUE,
     new_id, now,
-    get_submission, get_documents_for_submission,
+    get_submission, get_documents_for_submission, get_findings_for_submission,
 )
 from backend.services.ocr import extract_text
-from backend.services.extraction import extract_all
+from backend.services.extraction import extract_all, save_document_facts
 from backend.services.rag import run_full_assessment
 from backend.services.scoring import calculate_score
 
@@ -65,6 +65,7 @@ def _run_assessment(submission_id: str):
         # ── STEP 2: Structured extraction ──────────────────────────
         SUBMISSIONS[submission_id]["progress_step"] = 4
         merged = extract_all(doc_inputs)
+        merged["_ocr_texts"] = {doc["doc_type"]: doc["text"] for doc in doc_inputs}
         EXTRACTED[submission_id] = {
             "submission_id":   submission_id,
             "merged_fields":   merged,
@@ -72,9 +73,12 @@ def _run_assessment(submission_id: str):
             "created_at":      now(),
         }
 
+        # Save live document facts to all 8 document-specific SQL tables
+        save_document_facts(submission_id, merged)
+
         # ── STEP 3: RAG + LLM per dimension ────────────────────────
         SUBMISSIONS[submission_id]["progress_step"] = 5
-        findings = run_full_assessment(merged, state, entity_type)
+        findings = run_full_assessment(merged, state, entity_type, sub["org_name"])
 
         SUBMISSIONS[submission_id]["progress_step"] = 6
         for f in findings:
@@ -123,7 +127,7 @@ def _run_assessment(submission_id: str):
         # Save findings array to assessment_results/{submission_id}.json
         results_dir = Path("assessment_results")
         results_dir.mkdir(parents=True, exist_ok=True)
-        findings_list = [FINDINGS[fid] for fid in FINDINGS if FINDINGS[fid]["submission_id"] == submission_id]
+        findings_list = get_findings_for_submission(submission_id)
         with open(results_dir / f"{submission_id}.json", "w") as f:
             json.dump({
                 "submission_id": submission_id,
